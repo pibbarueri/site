@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { EventCard } from "@/components/event-card";
 import { ScheduleList } from "@/components/schedule-list";
+import { VideoEmbed } from "@/components/video-embed";
 import { Container, primaryButton, Section, secondaryButton, textLink } from "@/components/ui";
 import { getEvents } from "@/lib/calendar";
 import { SITE } from "@/lib/config";
@@ -106,14 +107,11 @@ export default async function Home() {
           }
         >
           <div className="grid gap-6 md:grid-cols-5">
-            <div className="aspect-video overflow-hidden rounded-lg border border-border bg-black md:col-span-3">
-              <iframe
-                className="h-full w-full"
-                src={`https://www.youtube-nocookie.com/embed/${latestVideo.id}`}
+            <div className="relative aspect-video overflow-hidden rounded-lg border border-border bg-black md:col-span-3">
+              <VideoEmbed
+                id={latestVideo.id}
                 title={latestVideo.title}
-                loading="lazy"
-                allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                allowFullScreen
+                thumbnail={latestVideo.thumbnail}
               />
             </div>
             <div className="md:col-span-2">
