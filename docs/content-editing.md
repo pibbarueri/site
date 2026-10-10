@@ -4,9 +4,29 @@ O site lê quatro arquivos do Google. Quem edita não precisa de código nem de 
 
 ## Agenda
 
-Edite o calendário **PIBB Eventos** no Google Agenda. Título, horário, local e descrição aparecem na página Agenda e na página inicial. Eventos que se repetem (semanais, mensais) funcionam. Eventos de dia inteiro e de vários dias também.
+Edite o calendário **PIBB Eventos** no Google Agenda. O site separa os eventos em dois tipos, sozinho, olhando como o evento se repete.
 
-O calendário precisa continuar público (Configurações do calendário, Permissões de acesso, Disponibilizar para o público).
+**Rotina (toda semana).** Evento que se repete toda semana por 8 semanas ou mais, como EBD, EBD+, culto e GPs. Ele não enche a lista da Agenda. Aparece uma vez só, no quadro "Toda semana" no alto da página Agenda. O título, o dia, o horário e a descrição do quadro vêm do próprio evento.
+
+**Eventos da lista.** Todo o resto: evento de um dia só, evento mensal ou anual, evento de dia inteiro ou de vários dias, e série semanal curta (um curso de 6 semanas, por exemplo). Eles aparecem na página Agenda, por mês, e nos "Próximos eventos" da página inicial.
+
+### Cancelar ou mudar um dia da rotina
+
+Use sempre "Este evento", nunca "Todos os eventos".
+
+- **Não vai ter EBD ou culto num domingo:** abra o evento daquele dia, clique em Excluir e escolha "Este evento". O site mostra um aviso "Não haverá" naquela data.
+- **O horário ou o nome muda num dia (por exemplo, "Culto de Natal"):** abra o evento daquele dia, edite e salve só "Este evento". O site mostra um aviso "Alterado" naquela data.
+
+Se você apagar "Todos os eventos", a série inteira some, inclusive do quadro "Toda semana".
+
+### Atenção: série semanal tem data final
+
+Quando você cria EBD, culto ou GP toda semana, o Google pede até quando repetir. Passada essa data, o item some do quadro "Toda semana". Renove a série antes de acabar (estenda a data final ou crie uma nova). Hoje, as séries terminam no fim de novembro (GP nos Lares) e em dezembro de 2026 (as demais).
+
+### Outras regras
+
+- Eventos de dia inteiro e de vários dias funcionam.
+- O calendário precisa continuar público (Configurações do calendário, Permissões de acesso, Disponibilizar para o público).
 
 ## Horários de culto e novidades
 
@@ -18,7 +38,7 @@ Aba `horarios` (os horários que aparecem na página inicial):
 | --- | --- | --- | --- |
 | Domingo | 18h30 | Culto | |
 
-Se a aba estiver vazia, o site usa os horários padrão que estão no código.
+Se a aba estiver vazia, o site usa os horários padrão que estão no código. Atenção: o quadro "Toda semana" da Agenda vem do calendário, e estes horários vêm da planilha. Para mudar um horário de forma permanente, atualize os dois.
 
 Aba `novidades` (os avisos da página inicial, os 3 mais recentes por data):
 
