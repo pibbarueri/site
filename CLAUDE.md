@@ -26,7 +26,7 @@ código nem de acesso à Vercel. O passo a passo para a equipe está em `docs/co
 
 | O quê | Onde a equipe edita | Como o site lê | Código |
 | --- | --- | --- | --- |
-| Agenda de eventos | Google Calendar "PIBB Eventos" | feed iCal público | `src/lib/calendar.ts`, `src/lib/ical-parse.ts` |
+| Agenda e rotina semanal | Google Calendar "PIBB Eventos" | feed iCal público | `src/lib/calendar.ts`, `src/lib/ical-parse.ts` |
 | Horários de culto | Planilha, aba `horarios` | CSV via `gviz` | `src/lib/sheet.ts` |
 | Novidades (avisos) | Planilha, aba `novidades` | CSV via `gviz` | `src/lib/sheet.ts` |
 | Ministérios e grupos pequenos | Google Doc "Ministerios" | export HTML | `src/lib/ministries.ts` |
@@ -55,6 +55,22 @@ Regras desse esquema:
   sem ajustar o código. Parágrafo só de traços ou sublinhados é descartado.
 - **Aba `horarios` vazia**: vale `DEFAULT_SCHEDULE` em `src/lib/config.ts`. Os horários oficiais
   estão lá, e mudar um horário permanente é editar a planilha, não o código.
+- **Agenda: rotina x esporádico** (`src/lib/ical-parse.ts`, `parseCalendar`). Série que repete
+  **toda semana por 8 semanas ou mais** (`ROUTINE_MIN_WEEKS`) é rotina: EBD, EBD+, culto, GPs.
+  Ela não entra na lista da Agenda nem em "Próximos eventos". Vira uma linha do quadro "Toda
+  semana" (`weekly`), com título, dia, horário e descrição tirados do próprio evento. Todo o resto
+  é evento da lista: dia único, mensal, anual e série semanal curta (um curso de 6 semanas).
+  A regra é por recorrência, sem etiqueta: ninguém precisa marcar nada no Calendar.
+- **Cancelamento e mudança de uma ocorrência da rotina aparecem na lista.** Apagar um domingo só
+  ("Este evento") põe um `EXDATE` na série, e o site mostra o card "Não haverá" (`kind:
+  "cancelled"`). Editar um dia só (nome ou horário) cria uma exceção, e o card sai como "Alterado"
+  (`kind: "changed"`). `STATUS:CANCELLED` também vira "Não haverá". Se mexer nesse trecho, testar
+  com os três casos (EXDATE, exceção, série curta) e com o calendário real.
+- **A série semanal tem data final** (`UNTIL`). Passada essa data, o item some do quadro "Toda
+  semana". A equipe precisa renovar a série antes (`docs/content-editing.md` avisa isso).
+- O quadro "Toda semana" da Agenda vem do Calendar. Já os "Horários" da página inicial vêm da
+  aba `horarios` da planilha (ou de `DEFAULT_SCHEDULE`). São duas fontes, então mudança permanente
+  de horário precisa ser feita nas duas.
 - O Google Calendar às vezes grava a descrição do evento com HTML. `cleanDescription` em
   `ical-parse.ts` tira as tags. Texto novo vindo do Google passa por limpeza parecida.
 - Não há CMS e não vai ter: se surgir pedido de painel de edição, avisar antes de implementar.
@@ -94,7 +110,7 @@ O guia da marca está num Canva (9 páginas, "Guia Identidade Visual PIBBARUERI"
   `Intl.DateTimeFormat` com `timeZone: SITE.timeZone` (`America/Sao_Paulo`), como em
   `src/lib/format.ts`. Evento de dia inteiro é `YYYY-MM-DD`, evento com hora é ISO completo.
   Com Cache Components, `new Date()` fora de uma função `"use cache"` quebra o prerender da página.
-  O relógio (`now`) só entra em `getEvents`.
+  O relógio (`now`) só entra em `getCalendar`.
 - Componentes client (`"use client"`) só quando precisa de estado ou evento do navegador (menu
   móvel, formulário). O resto é server component.
 - Link externo leva `target="_blank" rel="noopener noreferrer"`.
