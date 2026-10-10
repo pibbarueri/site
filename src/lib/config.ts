@@ -4,7 +4,7 @@ export const SITE = {
   url: "https://pibbarueri.org.br",
   email: "contato@pibbarueri.org.br",
   pastorEmail: "marcio@pibbarueri.org.br",
-  address: ["Rua Vitória, 283", "Vila São Jorge", "Barueri, SP"],
+  address: ["Rua Vitória, 283", "Vila São Jorge", "Barueri, SP", "CEP 06402-030"],
   mapsUrl:
     "https://www.google.com/maps/search/?api=1&query=Rua+Vit%C3%B3ria%2C+283%2C+Vila+S%C3%A3o+Jorge%2C+Barueri%2C+SP",
   social: {
