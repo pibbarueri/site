@@ -3,7 +3,7 @@ import { eventWhen } from "@/lib/format";
 
 const KIND_LABEL = {
   cancelled: { text: "Não haverá", className: "bg-brand text-white" },
-  changed: { text: "Alterado", className: "bg-brown text-white" },
+  changed: { text: "Alterado", className: "bg-copper text-white" },
 } as const;
 
 export function EventCard({ event }: { event: CalendarEvent }) {
