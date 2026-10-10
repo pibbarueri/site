@@ -73,8 +73,11 @@ Regras desse esquema:
   precisa renovar a série antes do fim (`docs/content-editing.md` avisa isso).
 - **A página Agenda é um calendário mensal** (`src/components/agenda-calendar.tsx`, componente
   client). A janela vai do início do mês atual até 12 meses à frente (`MONTHS_SHOWN` em
-  `calendar.ts`). Clicar num dia mostra os eventos dele num painel embaixo (no celular o quadrado
-  só mostra pontos). A página inicial usa `upcoming`, que já vem sem o que acabou.
+  `calendar.ts`). É um calendário limpo, sem grade e sem título dentro das células: só os números
+  dos dias, com um ponto embaixo do dia que tem evento (cinza: evento, vermelho: não haverá,
+  cobre: alterado). Só dia com evento é clicável, e o clique mostra os eventos dele num painel
+  embaixo do calendário. Hoje tem contorno vermelho e o dia aberto fica num círculo branco. A
+  página inicial usa `upcoming`, que já vem sem o que acabou.
 - **Hoje no calendário**: `new Date()` não pode rodar no prerender. `agenda-calendar.tsx` usa
   `useSyncExternalStore` com o dia em que o Calendar foi lido (`today`) como valor do servidor, e
   troca pelo dia do navegador depois de hidratar. Dia sempre como string `YYYY-MM-DD` no fuso
