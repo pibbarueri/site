@@ -17,7 +17,7 @@ export default async function Home() {
     getVideos(1),
     getNews(3),
   ]);
-  const events = calendar.events.slice(0, 3);
+  const events = calendar.upcoming.slice(0, 3);
   const latestVideo = videos[0];
 
   return (

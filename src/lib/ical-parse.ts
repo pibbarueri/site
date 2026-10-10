@@ -1,52 +1,31 @@
 import ICAL from "ical.js";
+import { toInstant, type CalendarEvent, type ParsedCalendar, type WeeklyItem } from "./calendar-types";
+import { dayInZone } from "./dates";
 import { SITE } from "./config";
 
-export type CalendarEvent = {
-  id: string;
-  title: string;
-  // Full ISO string for timed events. YYYY-MM-DD for all-day events.
-  start: string;
-  // Last day (inclusive) for all-day events. ISO string for timed events.
-  end: string | null;
-  allDay: boolean;
-  location?: string;
-  description?: string;
-  // Only set for one occurrence of a weekly routine event that is different from usual:
-  // "changed" (other time or title) or "cancelled" (it will not happen).
-  kind?: "changed" | "cancelled";
-};
+export { toInstant };
+export type { CalendarEvent, ParsedCalendar, WeeklyItem };
 
-// A weekly routine event (EBD, Culto, GPs...), shown as a standing schedule instead of
-// repeating in the agenda every week.
-export type WeeklyItem = {
-  weekday: number; // 0 = Sunday
-  time: string; // HH:mm in SITE.timeZone
-  title: string;
-  note?: string;
-};
-
-export type ParsedCalendar = {
-  events: CalendarEvent[];
-  weekly: WeeklyItem[];
+export type ParseOptions = {
+  from: Date; // first moment of the agenda window (start of the current month)
+  now: Date;
+  until: Date;
+  limit: number;
 };
 
 // A series that repeats every week for at least this long is routine. Shorter weekly series
 // (a 3 week conference, a 6 week course) and monthly or yearly events are regular agenda events.
 const ROUTINE_MIN_WEEKS = 8;
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+// A routine item is shown in the weekly block while it has an occurrence in the next days.
+// When a semester ends the item leaves the block and comes back this long before the first
+// meeting of the next series.
+const WEEKLY_LOOKAHEAD_DAYS = 45;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const WEEK_MS = 7 * DAY_MS;
 const MAX_ITERATIONS = 5000;
-const MAX_PER_EVENT = 60;
+const MAX_PER_EVENT = 400;
 const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
 const WEEKDAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function todayInZone(date: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: SITE.timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
 
 function previousDay(day: string): string {
   const d = new Date(`${day}T00:00:00Z`);
@@ -92,12 +71,28 @@ function cleanDescription(text: string): string | undefined {
   return clean || undefined;
 }
 
-// Only used for sorting. Brazil has had no daylight saving time since 2019.
-export function toInstant(e: Pick<CalendarEvent, "start" | "allDay">): number {
-  return Date.parse(e.allDay ? `${e.start}T00:00:00-03:00` : e.start);
+function isUpcoming(e: CalendarEvent, now: Date): boolean {
+  if (e.allDay) return (e.end ?? e.start) >= dayInZone(now);
+  return Date.parse(e.end ?? e.start) >= now.getTime();
 }
 
 type Phase = "past" | "in" | "after";
+
+// Where an occurrence sits relative to the window [from, until].
+function phaseIn(start: ICAL.Time, end: ICAL.Time | null, from: Date, until: Date): Phase {
+  if (start.isDate) {
+    const first = start.toString();
+    const last = end ? previousDay(end.toString()) : first;
+    if (last < dayInZone(from)) return "past";
+    if (Date.parse(`${first}T00:00:00-03:00`) > until.getTime()) return "after";
+    return "in";
+  }
+  const begins = start.toJSDate().getTime();
+  const ends = end ? end.toJSDate().getTime() : begins;
+  if (begins > until.getTime()) return "after";
+  if (ends < from.getTime()) return "past";
+  return "in";
+}
 
 function isRoutine(ev: ICAL.Event): boolean {
   if (!ev.isRecurring()) return false;
@@ -130,12 +125,10 @@ function weeklyItems(ev: ICAL.Event): WeeklyItem[] {
     }));
 }
 
-export function parseCalendar(
-  text: string,
-  from: Date,
-  until: Date,
-  limit: number,
-): ParsedCalendar {
+export function parseCalendar(text: string, options: ParseOptions): ParsedCalendar {
+  const { from, now, until, limit } = options;
+  const weeklyUntil = new Date(now.getTime() + WEEKLY_LOOKAHEAD_DAYS * DAY_MS);
+
   const calendar = new ICAL.Component(ICAL.parse(text));
   for (const tz of calendar.getAllSubcomponents("vtimezone")) {
     ICAL.TimezoneService.register(tz);
@@ -153,24 +146,8 @@ export function parseCalendar(
     else masters.push(ex);
   }
 
-  const today = todayInZone(from);
   const events: CalendarEvent[] = [];
   const weekly = new Map<string, WeeklyItem>();
-
-  const phaseOf = (start: ICAL.Time, end: ICAL.Time | null): Phase => {
-    if (start.isDate) {
-      const first = start.toString();
-      const last = end ? previousDay(end.toString()) : first;
-      if (last < today) return "past";
-      if (Date.parse(`${first}T00:00:00-03:00`) > until.getTime()) return "after";
-      return "in";
-    }
-    const begins = start.toJSDate().getTime();
-    const ends = end ? end.toJSDate().getTime() : begins;
-    if (begins > until.getTime()) return "after";
-    if (ends < from.getTime()) return "past";
-    return "in";
-  };
 
   const build = (
     base: ICAL.Event,
@@ -209,7 +186,7 @@ export function parseCalendar(
   for (const ev of masters) {
     if (!ev.isRecurring()) {
       const end = ev.endDate ?? null;
-      if (phaseOf(ev.startDate, end) === "in") {
+      if (phaseIn(ev.startDate, end, from, until) === "in") {
         events.push(build(ev, ev, ev.startDate, end, isCancelled(ev) ? "cancelled" : undefined));
       }
       continue;
@@ -219,16 +196,15 @@ export function parseCalendar(
     let active = false;
     let accepted = 0;
     const iterator = ev.iterator();
-    let next: ICAL.Time | undefined;
     for (let i = 0; i < MAX_ITERATIONS && accepted < MAX_PER_EVENT; i++) {
-      next = iterator.next();
+      const next = iterator.next();
       if (!next) break;
       const details = ev.getOccurrenceDetails(next);
       const end = details.endDate ?? null;
-      const phase = phaseOf(details.startDate, end);
-      if (phase === "past") continue;
+      const phase = phaseIn(details.startDate, end, from, until);
       if (phase === "after") break;
-      active = true;
+      if (routine && phaseIn(details.startDate, end, now, weeklyUntil) === "in") active = true;
+      if (phase === "past") continue;
       const isException = details.item !== ev;
       const cancelled = isCancelled(details.item);
       // Regular occurrences of a routine event live in the weekly schedule. Only the ones
@@ -245,8 +221,8 @@ export function parseCalendar(
         for (const value of prop.getValues() as ICAL.Time[]) {
           const end = value.clone();
           end.addDuration(ev.duration);
-          if (phaseOf(value, end) !== "in") continue;
-          active = true;
+          if (phaseIn(value, end, now, weeklyUntil) === "in") active = true;
+          if (phaseIn(value, end, from, until) !== "in") continue;
           events.push(build(ev, ev, value, end, "cancelled"));
         }
       }
@@ -258,10 +234,13 @@ export function parseCalendar(
     }
   }
 
+  const sorted = events.sort((a, b) => toInstant(a) - toInstant(b)).slice(0, limit);
   return {
-    events: events.sort((a, b) => toInstant(a) - toInstant(b)).slice(0, limit),
+    events: sorted,
+    upcoming: sorted.filter((e) => isUpcoming(e, now)),
     weekly: [...weekly.values()].sort(
       (a, b) => a.weekday - b.weekday || a.time.localeCompare(b.time),
     ),
+    today: dayInZone(now),
   };
 }
