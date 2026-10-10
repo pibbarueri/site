@@ -78,6 +78,11 @@ Regras desse esquema:
   cobre: alterado). Só dia com evento é clicável, e o clique mostra os eventos dele num painel
   embaixo do calendário. Hoje tem contorno vermelho e o dia aberto fica num círculo branco. A
   página inicial usa `upcoming`, que já vem sem o que acabou.
+- **Um bloco por dia, não por evento** (`src/components/day-card.tsx`). Os eventos do mesmo dia
+  ficam juntos num `DayCard`, separados por uma linha, tanto no painel da Agenda quanto nos
+  "Próximos eventos" da página inicial (que mostram os próximos 3 dias com evento, com a data em
+  destaque). `groupByDay` faz o agrupamento e devolve os dias em ordem. Um evento de dia inteiro
+  que dura vários dias aparece em cada um deles ("13 a 15 de nov").
 - **Hoje no calendário**: `new Date()` não pode rodar no prerender. `agenda-calendar.tsx` usa
   `useSyncExternalStore` com o dia em que o Calendar foi lido (`today`) como valor do servidor, e
   troca pelo dia do navegador depois de hidratar. Dia sempre como string `YYYY-MM-DD` no fuso

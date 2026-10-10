@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { EventCard } from "@/components/event-card";
+import { DayCard } from "@/components/day-card";
 import { ScheduleList } from "@/components/schedule-list";
 import { VideoEmbed } from "@/components/video-embed";
 import { Container, primaryButton, Section, secondaryButton, textLink } from "@/components/ui";
 import { getCalendar } from "@/lib/calendar";
+import { groupByDay } from "@/lib/calendar-grid";
 import { SITE } from "@/lib/config";
 import { longDate } from "@/lib/format";
 import { getNews, getSchedule } from "@/lib/sheet";
@@ -17,7 +18,10 @@ export default async function Home() {
     getVideos(1),
     getNews(3),
   ]);
-  const events = calendar.upcoming.slice(0, 3);
+  // One block per day. A multi-day event also adds days that already passed, so skip those.
+  const days = [...groupByDay(calendar.upcoming)]
+    .filter(([day]) => day >= calendar.today)
+    .slice(0, 3);
   const latestVideo = videos[0];
 
   return (
@@ -81,10 +85,10 @@ export default async function Home() {
           </Link>
         }
       >
-        {events.length > 0 ? (
+        {days.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-3">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
+            {days.map(([day, dayEvents]) => (
+              <DayCard key={day} day={day} events={dayEvents} />
             ))}
           </div>
         ) : (
