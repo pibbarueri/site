@@ -8,15 +8,17 @@ import { addMonths, dayInZone, monthOf } from "@/lib/dates";
 
 // The current month and the 11 after it, matching the window read in getCalendar.
 const LAST_MONTH_OFFSET = 11;
+// Dots under a day: more than this would not fit under the number.
+const MAX_DOTS = 3;
 
 const WEEKDAYS = [
-  ["Dom", "Domingo"],
-  ["Seg", "Segunda-feira"],
-  ["Ter", "Terça-feira"],
-  ["Qua", "Quarta-feira"],
-  ["Qui", "Quinta-feira"],
-  ["Sex", "Sexta-feira"],
-  ["Sáb", "Sábado"],
+  ["D", "Domingo"],
+  ["S", "Segunda-feira"],
+  ["T", "Terça-feira"],
+  ["Q", "Quarta-feira"],
+  ["Q", "Quinta-feira"],
+  ["S", "Sexta-feira"],
+  ["S", "Sábado"],
 ] as const;
 
 const monthFormat = new Intl.DateTimeFormat("pt-BR", {
@@ -35,19 +37,11 @@ const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 const formatMonth = (month: string) => capitalize(monthFormat.format(new Date(`${month}-01T12:00:00Z`)));
 const formatDay = (day: string) => capitalize(dayFormat.format(new Date(`${day}T12:00:00Z`)));
 
-const chipClass = (e: CalendarEvent) =>
-  e.kind === "cancelled"
-    ? "bg-brand text-white"
-    : e.kind === "changed"
-      ? "bg-copper text-white"
-      : "border border-border bg-surface-raised text-neutral-100";
-
-const dotClass = (e: CalendarEvent) =>
-  e.kind === "cancelled" ? "bg-brand" : e.kind === "changed" ? "bg-copper" : "bg-neutral-300";
-
-// The time is left out of the chip: the cell is narrow and the day panel below has it.
-function chipText(e: CalendarEvent): string {
-  return `${e.kind === "cancelled" ? "Não haverá: " : ""}${e.title}`;
+// The selected day is a white circle, so its dots flip to dark to stay visible.
+function dotClass(e: CalendarEvent, selected: boolean): string {
+  if (e.kind === "cancelled") return "bg-brand";
+  if (e.kind === "changed") return "bg-copper";
+  return selected ? "bg-black" : "bg-neutral-300";
 }
 
 // Today comes from the browser, but the server render (and the first client render) use the
@@ -58,7 +52,10 @@ function useToday(serverToday: string): string {
 }
 
 const navButton =
-  "rounded border border-border px-3.5 py-1 text-xl font-semibold leading-none text-white transition-colors hover:border-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border";
+  "rounded-full border border-border px-3.5 py-1 text-xl font-semibold leading-none text-white transition-colors hover:border-white disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border";
+
+const dayBase =
+  "relative mx-auto flex h-11 w-11 items-center justify-center rounded-full text-sm font-semibold sm:h-12 sm:w-12 sm:text-base";
 
 export function AgendaCalendar({
   events,
@@ -83,8 +80,8 @@ export function AgendaCalendar({
 
   return (
     <div>
-      <div className="overflow-hidden rounded-lg border border-border bg-surface">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+      <div className="rounded-lg border border-border bg-surface px-3 py-4 sm:px-6 sm:py-6">
+        <div className="mb-4 flex items-center justify-between">
           <button
             type="button"
             className={navButton}
@@ -108,15 +105,11 @@ export function AgendaCalendar({
           </button>
         </div>
 
-        <table className="w-full table-fixed border-collapse">
+        <table className="w-full table-fixed border-separate border-spacing-y-1">
           <thead>
             <tr>
-              {WEEKDAYS.map(([short, full]) => (
-                <th
-                  key={short}
-                  scope="col"
-                  className="border-b border-border py-2 text-xs font-semibold uppercase tracking-wider text-muted"
-                >
+              {WEEKDAYS.map(([short, full], i) => (
+                <th key={i} scope="col" className="pb-1 text-xs font-semibold uppercase text-muted">
                   <abbr title={full} className="no-underline">
                     {short}
                   </abbr>
@@ -128,53 +121,40 @@ export function AgendaCalendar({
             {weeks.map((week) => (
               <tr key={week[0].date}>
                 {week.map((day) => {
-                  if (!day.inMonth) {
-                    return <td key={day.date} className="border-l border-t border-border bg-black/40 first:border-l-0" />;
-                  }
+                  if (!day.inMonth) return <td key={day.date} />;
                   const dayEvents = byDay.get(day.date) ?? [];
                   const isToday = day.date === today;
                   const isPast = day.date < today;
-                  const number = (
-                    <span
-                      className={`inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-sm font-semibold ${
-                        isToday ? "bg-brand text-white" : isPast ? "text-muted" : ""
-                      }`}
-                    >
-                      {Number(day.date.slice(8))}
-                    </span>
-                  );
+                  const isSelected = day.date === activeDay;
+                  const number = Number(day.date.slice(8));
+                  const ring = isToday ? "ring-2 ring-brand" : "";
+                  const tone = isPast ? "text-muted" : "text-white";
+
+                  if (dayEvents.length === 0) {
+                    return (
+                      <td key={day.date} className="p-0">
+                        <span className={`${dayBase} ${ring} ${tone}`}>{number}</span>
+                      </td>
+                    );
+                  }
                   return (
-                    <td key={day.date} className="border-l border-t border-border p-0 align-top first:border-l-0">
-                      {dayEvents.length > 0 ? (
-                        <button
-                          type="button"
-                          aria-pressed={day.date === activeDay}
-                          aria-label={`${formatDay(day.date)}: ${dayEvents.length} ${dayEvents.length === 1 ? "evento" : "eventos"}`}
-                          onClick={() => setSelectedDay(day.date)}
-                          className={`flex min-h-16 w-full flex-col items-stretch gap-1 p-1.5 text-left transition-colors hover:bg-surface-raised md:min-h-32 ${
-                            day.date === activeDay ? "bg-surface-raised ring-2 ring-inset ring-white" : ""
-                          }`}
-                        >
-                          {number}
-                          <span className="hidden space-y-1 md:block">
-                            {dayEvents.slice(0, 3).map((e) => (
-                              <span key={e.id} className={`block line-clamp-2 rounded px-1.5 py-0.5 text-xs leading-snug wrap-anywhere ${chipClass(e)}`}>
-                                {chipText(e)}
-                              </span>
-                            ))}
-                            {dayEvents.length > 3 && (
-                              <span className="block px-1 text-xs text-muted">+{dayEvents.length - 3} mais</span>
-                            )}
-                          </span>
-                          <span className="flex gap-1 px-1 md:hidden" aria-hidden="true">
-                            {dayEvents.slice(0, 3).map((e) => (
-                              <span key={e.id} className={`h-1.5 w-1.5 rounded-full ${dotClass(e)}`} />
-                            ))}
-                          </span>
-                        </button>
-                      ) : (
-                        <div className="min-h-16 p-1.5 md:min-h-32">{number}</div>
-                      )}
+                    <td key={day.date} className="p-0">
+                      <button
+                        type="button"
+                        aria-pressed={isSelected}
+                        aria-label={`${formatDay(day.date)}: ${dayEvents.length} ${dayEvents.length === 1 ? "evento" : "eventos"}`}
+                        onClick={() => setSelectedDay(day.date)}
+                        className={`${dayBase} ${ring} transition-colors ${
+                          isSelected ? "bg-white text-black" : `${tone} hover:bg-surface-raised`
+                        }`}
+                      >
+                        {number}
+                        <span className="absolute bottom-1 flex gap-0.5" aria-hidden="true">
+                          {dayEvents.slice(0, MAX_DOTS).map((e) => (
+                            <span key={e.id} className={`h-1.5 w-1.5 rounded-full ${dotClass(e, isSelected)}`} />
+                          ))}
+                        </span>
+                      </button>
                     </td>
                   );
                 })}
@@ -182,18 +162,22 @@ export function AgendaCalendar({
             ))}
           </tbody>
         </table>
-      </div>
 
-      <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">
-        <li className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm bg-brand" aria-hidden="true" />
-          Não haverá
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-sm bg-copper" aria-hidden="true" />
-          Alterado
-        </li>
-      </ul>
+        <ul className="mt-4 flex flex-wrap justify-center gap-x-5 gap-y-1 text-xs text-muted">
+          <li className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-neutral-300" aria-hidden="true" />
+            Evento
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
+            Não haverá
+          </li>
+          <li className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-copper" aria-hidden="true" />
+            Alterado
+          </li>
+        </ul>
+      </div>
 
       <section className="mt-8">
         {activeDay ? (
