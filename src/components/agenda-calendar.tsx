@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { EventCard } from "@/components/event-card";
+import { DayCard } from "@/components/day-card";
 import { buildMonth, groupByDay } from "@/lib/calendar-grid";
 import type { CalendarEvent } from "@/lib/calendar-types";
 import { addMonths, dayInZone, monthOf } from "@/lib/dates";
@@ -183,11 +183,7 @@ export function AgendaCalendar({
         {activeDay ? (
           <>
             <h3 className="mb-4 text-lg font-bold">{formatDay(activeDay)}</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              {(byDay.get(activeDay) ?? []).map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
+            <DayCard day={activeDay} events={byDay.get(activeDay) ?? []} showDate={false} />
           </>
         ) : (
           <p className="text-muted">Não há eventos marcados em {monthLabel.toLowerCase()}.</p>

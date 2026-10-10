@@ -32,6 +32,10 @@ const longDateFormat = new Intl.DateTimeFormat(LOCALE, {
   month: "long",
   year: "numeric",
 });
+// Plain calendar days ("YYYY-MM-DD") are formatted at noon UTC, so no zone can shift them.
+const dayWeekdayFormat = new Intl.DateTimeFormat(LOCALE, { timeZone: "UTC", weekday: "long" });
+const dayNumberUtcFormat = new Intl.DateTimeFormat(LOCALE, { timeZone: "UTC", day: "numeric" });
+const dayMonthUtcFormat = new Intl.DateTimeFormat(LOCALE, { timeZone: "UTC", month: "short" });
 
 function toDate(e: Pick<CalendarEvent, "start" | "allDay">): Date {
   return new Date(e.allDay ? `${e.start}T12:00:00-03:00` : e.start);
@@ -50,10 +54,22 @@ export type EventWhen = {
   dayNumber: string;
   month: string;
   weekday: string;
-  time: string | null;
+  // Only the time part: "18h30 às 20h30", "Dia inteiro" or "13 a 15 de nov".
+  timeLabel: string;
   summary: string;
   monthYear: string;
 };
+
+// "13 a 15 de nov", or "30 de nov a 2 de dez" when the range crosses a month.
+function dayRange(first: Date, last: Date): string {
+  const firstMonth = shortMonthFormat.format(first).replace(".", "");
+  const lastMonth = shortMonthFormat.format(last).replace(".", "");
+  const firstNumber = dayNumberFormat.format(first);
+  const lastNumber = dayNumberFormat.format(last);
+  return firstMonth === lastMonth
+    ? `${firstNumber} a ${lastNumber} de ${lastMonth}`
+    : `${firstNumber} de ${firstMonth} a ${lastNumber} de ${lastMonth}`;
+}
 
 export function eventWhen(e: CalendarEvent): EventWhen {
   const start = toDate(e);
@@ -64,10 +80,15 @@ export function eventWhen(e: CalendarEvent): EventWhen {
 
   if (e.allDay) {
     const last = e.end ? toDate({ start: e.end, allDay: true }) : null;
-    const summary = last
-      ? `${weekday}, ${dayNumber} a ${dayNumberFormat.format(last)} de ${shortMonthFormat.format(last).replace(".", "")}`
-      : `${weekday}, ${dayNumber} de ${month}`;
-    return { dayNumber, month, weekday, time: null, summary, monthYear };
+    const range = last ? dayRange(start, last) : null;
+    return {
+      dayNumber,
+      month,
+      weekday,
+      timeLabel: range ?? "Dia inteiro",
+      summary: range ? `${weekday}, ${range}` : `${weekday}, ${dayNumber} de ${month}`,
+      monthYear,
+    };
   }
 
   const time = shortTime(start);
@@ -78,9 +99,24 @@ export function eventWhen(e: CalendarEvent): EventWhen {
     dayNumber,
     month,
     weekday,
-    time: range,
+    timeLabel: range,
     summary: `${weekday}, ${dayNumber} de ${month}, ${range}`,
     monthYear,
+  };
+}
+
+export type DayLabel = {
+  dayNumber: string;
+  month: string;
+  weekday: string;
+};
+
+export function dayLabel(day: string): DayLabel {
+  const date = new Date(`${day}T12:00:00Z`);
+  return {
+    dayNumber: dayNumberUtcFormat.format(date),
+    month: dayMonthUtcFormat.format(date).replace(".", ""),
+    weekday: capitalize(dayWeekdayFormat.format(date)),
   };
 }
 

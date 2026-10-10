@@ -51,5 +51,6 @@ export function groupByDay(events: CalendarEvent[]): Map<string, CalendarEvent[]
     }
   }
   for (const list of byDay.values()) list.sort((a, b) => toInstant(a) - toInstant(b));
-  return byDay;
+  // An event that spans days adds its days out of order, so sort the days.
+  return new Map([...byDay].sort(([a], [b]) => (a < b ? -1 : 1)));
 }
