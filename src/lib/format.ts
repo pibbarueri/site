@@ -1,5 +1,5 @@
-import { SITE } from "./config";
-import type { CalendarEvent } from "./ical-parse";
+import { SITE, type ScheduleItem } from "./config";
+import type { CalendarEvent, WeeklyItem } from "./ical-parse";
 
 const LOCALE = "pt-BR";
 
@@ -82,6 +82,26 @@ export function eventWhen(e: CalendarEvent): EventWhen {
     summary: `${weekday}, ${dayNumber} de ${month}, ${range}`,
     monthYear,
   };
+}
+
+const WEEKDAY_NAMES = [
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado",
+];
+
+// Weekly routine events from the calendar, in the same shape as the schedule list.
+export function weeklyToSchedule(items: WeeklyItem[]): ScheduleItem[] {
+  return items.map((item) => ({
+    day: WEEKDAY_NAMES[item.weekday],
+    time: item.time.replace(":", "h"),
+    name: item.title,
+    note: item.note,
+  }));
 }
 
 export function longDate(isoDate: string): string {

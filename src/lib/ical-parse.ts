@@ -11,10 +11,33 @@ export type CalendarEvent = {
   allDay: boolean;
   location?: string;
   description?: string;
+  // Only set for one occurrence of a weekly routine event that is different from usual:
+  // "changed" (other time or title) or "cancelled" (it will not happen).
+  kind?: "changed" | "cancelled";
 };
 
+// A weekly routine event (EBD, Culto, GPs...), shown as a standing schedule instead of
+// repeating in the agenda every week.
+export type WeeklyItem = {
+  weekday: number; // 0 = Sunday
+  time: string; // HH:mm in SITE.timeZone
+  title: string;
+  note?: string;
+};
+
+export type ParsedCalendar = {
+  events: CalendarEvent[];
+  weekly: WeeklyItem[];
+};
+
+// A series that repeats every week for at least this long is routine. Shorter weekly series
+// (a 3 week conference, a 6 week course) and monthly or yearly events are regular agenda events.
+const ROUTINE_MIN_WEEKS = 8;
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_ITERATIONS = 5000;
 const MAX_PER_EVENT = 60;
+const WEEKDAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+const WEEKDAY_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function todayInZone(date: Date): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -29,6 +52,23 @@ function previousDay(day: string): string {
   const d = new Date(`${day}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().slice(0, 10);
+}
+
+function weekdayInZone(date: Date): number {
+  const short = new Intl.DateTimeFormat("en-US", {
+    timeZone: SITE.timeZone,
+    weekday: "short",
+  }).format(date);
+  return WEEKDAY_SHORT.indexOf(short);
+}
+
+function timeInZone(date: Date): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: SITE.timeZone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
 }
 
 const ENTITIES: Record<string, string> = {
@@ -57,12 +97,45 @@ export function toInstant(e: Pick<CalendarEvent, "start" | "allDay">): number {
   return Date.parse(e.allDay ? `${e.start}T00:00:00-03:00` : e.start);
 }
 
-export function parseEvents(
+type Phase = "past" | "in" | "after";
+
+function isRoutine(ev: ICAL.Event): boolean {
+  if (!ev.isRecurring()) return false;
+  const rule = ev.component.getFirstPropertyValue("rrule") as ICAL.Recur | null;
+  if (!rule || rule.freq !== "WEEKLY" || (rule.interval ?? 1) !== 1) return false;
+  if (rule.count) return rule.count >= ROUTINE_MIN_WEEKS;
+  if (rule.until) {
+    const weeks = (rule.until.toJSDate().getTime() - ev.startDate.toJSDate().getTime()) / WEEK_MS;
+    return weeks >= ROUTINE_MIN_WEEKS;
+  }
+  return true;
+}
+
+function isCancelled(item: ICAL.Event): boolean {
+  return item.component.getFirstPropertyValue("status") === "CANCELLED";
+}
+
+function weeklyItems(ev: ICAL.Event): WeeklyItem[] {
+  const rule = ev.component.getFirstPropertyValue("rrule") as ICAL.Recur;
+  const codes = (rule.getComponent("BYDAY") as string[]).map((c) => c.slice(-2));
+  const first = ev.startDate.toJSDate();
+  const weekdays = codes.length > 0 ? codes.map((c) => WEEKDAY_CODES.indexOf(c)) : [weekdayInZone(first)];
+  return weekdays
+    .filter((d) => d >= 0)
+    .map((weekday) => ({
+      weekday,
+      time: timeInZone(first),
+      title: ev.summary || "Evento",
+      note: cleanDescription(ev.description || ""),
+    }));
+}
+
+export function parseCalendar(
   text: string,
   from: Date,
   until: Date,
   limit: number,
-): CalendarEvent[] {
+): ParsedCalendar {
   const calendar = new ICAL.Component(ICAL.parse(text));
   for (const tz of calendar.getAllSubcomponents("vtimezone")) {
     ICAL.TimezoneService.register(tz);
@@ -81,67 +154,114 @@ export function parseEvents(
   }
 
   const today = todayInZone(from);
-  const result: CalendarEvent[] = [];
+  const events: CalendarEvent[] = [];
+  const weekly = new Map<string, WeeklyItem>();
 
-  // Returns false once the occurrences are past the window and iteration can stop.
-  const record = (
+  const phaseOf = (start: ICAL.Time, end: ICAL.Time | null): Phase => {
+    if (start.isDate) {
+      const first = start.toString();
+      const last = end ? previousDay(end.toString()) : first;
+      if (last < today) return "past";
+      if (Date.parse(`${first}T00:00:00-03:00`) > until.getTime()) return "after";
+      return "in";
+    }
+    const begins = start.toJSDate().getTime();
+    const ends = end ? end.toJSDate().getTime() : begins;
+    if (begins > until.getTime()) return "after";
+    if (ends < from.getTime()) return "past";
+    return "in";
+  };
+
+  const build = (
     base: ICAL.Event,
     item: ICAL.Event,
     start: ICAL.Time,
     end: ICAL.Time | null,
-  ): boolean => {
-    const allDay = start.isDate;
-    let event: CalendarEvent;
-    if (allDay) {
+    kind?: CalendarEvent["kind"],
+  ): CalendarEvent => {
+    const shared = {
+      title: item.summary || "Evento",
+      location: item.location || undefined,
+      description: cleanDescription(item.description || ""),
+      kind,
+    };
+    if (start.isDate) {
       const first = start.toString();
       const last = end ? previousDay(end.toString()) : first;
-      if (last < today) return true;
-      if (first > today && Date.parse(`${first}T00:00:00-03:00`) > until.getTime()) return false;
-      event = {
+      return {
+        ...shared,
         id: `${base.uid}-${first}`,
-        title: item.summary || "Evento",
         start: first,
         end: last > first ? last : null,
         allDay: true,
-        location: item.location || undefined,
-        description: cleanDescription(item.description || ""),
-      };
-    } else {
-      const begins = start.toJSDate();
-      const ends = end ? end.toJSDate() : null;
-      if (begins.getTime() > until.getTime()) return false;
-      if ((ends ?? begins).getTime() < from.getTime()) return true;
-      event = {
-        id: `${base.uid}-${begins.toISOString()}`,
-        title: item.summary || "Evento",
-        start: begins.toISOString(),
-        end: ends ? ends.toISOString() : null,
-        allDay: false,
-        location: item.location || undefined,
-        description: cleanDescription(item.description || ""),
       };
     }
-    result.push(event);
-    return true;
+    const begins = start.toJSDate();
+    return {
+      ...shared,
+      id: `${base.uid}-${begins.toISOString()}`,
+      start: begins.toISOString(),
+      end: end ? end.toJSDate().toISOString() : null,
+      allDay: false,
+    };
   };
 
   for (const ev of masters) {
     if (!ev.isRecurring()) {
-      record(ev, ev, ev.startDate, ev.endDate ?? null);
+      const end = ev.endDate ?? null;
+      if (phaseOf(ev.startDate, end) === "in") {
+        events.push(build(ev, ev, ev.startDate, end, isCancelled(ev) ? "cancelled" : undefined));
+      }
       continue;
     }
+
+    const routine = isRoutine(ev);
+    let active = false;
+    let accepted = 0;
     const iterator = ev.iterator();
     let next: ICAL.Time | undefined;
-    let iterations = 0;
-    let accepted = 0;
-    while ((next = iterator.next()) && iterations++ < MAX_ITERATIONS && accepted < MAX_PER_EVENT) {
+    for (let i = 0; i < MAX_ITERATIONS && accepted < MAX_PER_EVENT; i++) {
+      next = iterator.next();
+      if (!next) break;
       const details = ev.getOccurrenceDetails(next);
-      const before = result.length;
-      const keepGoing = record(ev, details.item, details.startDate, details.endDate ?? null);
-      if (result.length > before) accepted++;
-      if (!keepGoing) break;
+      const end = details.endDate ?? null;
+      const phase = phaseOf(details.startDate, end);
+      if (phase === "past") continue;
+      if (phase === "after") break;
+      active = true;
+      const isException = details.item !== ev;
+      const cancelled = isCancelled(details.item);
+      // Regular occurrences of a routine event live in the weekly schedule. Only the ones
+      // that differ (edited or cancelled) go to the agenda.
+      if (routine && !isException && !cancelled) continue;
+      const kind = cancelled ? "cancelled" : routine ? "changed" : undefined;
+      events.push(build(ev, details.item, details.startDate, end, kind));
+      accepted++;
+    }
+
+    if (routine) {
+      // Deleting a single occurrence in Google Calendar adds an EXDATE to the series.
+      for (const prop of ev.component.getAllProperties("exdate")) {
+        for (const value of prop.getValues() as ICAL.Time[]) {
+          const end = value.clone();
+          end.addDuration(ev.duration);
+          if (phaseOf(value, end) !== "in") continue;
+          active = true;
+          events.push(build(ev, ev, value, end, "cancelled"));
+        }
+      }
+      if (active) {
+        for (const item of weeklyItems(ev)) {
+          weekly.set(`${item.weekday}-${item.time}-${item.title.toLowerCase()}`, item);
+        }
+      }
     }
   }
 
-  return result.sort((a, b) => toInstant(a) - toInstant(b)).slice(0, limit);
+  return {
+    events: events.sort((a, b) => toInstant(a) - toInstant(b)).slice(0, limit),
+    weekly: [...weekly.values()].sort(
+      (a, b) => a.weekday - b.weekday || a.time.localeCompare(b.time),
+    ),
+  };
 }

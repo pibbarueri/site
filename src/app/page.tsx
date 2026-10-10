@@ -4,19 +4,20 @@ import { EventCard } from "@/components/event-card";
 import { ScheduleList } from "@/components/schedule-list";
 import { VideoEmbed } from "@/components/video-embed";
 import { Container, primaryButton, Section, secondaryButton, textLink } from "@/components/ui";
-import { getEvents } from "@/lib/calendar";
+import { getCalendar } from "@/lib/calendar";
 import { SITE } from "@/lib/config";
 import { longDate } from "@/lib/format";
 import { getNews, getSchedule } from "@/lib/sheet";
 import { getVideos } from "@/lib/youtube";
 
 export default async function Home() {
-  const [schedule, events, videos, news] = await Promise.all([
+  const [schedule, calendar, videos, news] = await Promise.all([
     getSchedule(),
-    getEvents(3),
+    getCalendar(),
     getVideos(1),
     getNews(3),
   ]);
+  const events = calendar.events.slice(0, 3);
   const latestVideo = videos[0];
 
   return (
