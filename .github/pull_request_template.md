@@ -6,10 +6,13 @@ Descreva qual era o problema/necessidade, e o impacto.
 
 Descreva brevemente como foi resolvido
 
-> Screenshot, se aplicável
+### Screenshots
+
+> Obrigatório quando o PR muda alguma tela: capturas de página inteira, no computador e no celular. Em ajuste de tela que já existe, mostre antes e depois. PR sem mudança visual escreve "Sem mudança visual". Como gerar e hospedar as imagens: seção "Screenshots no PR" do `CLAUDE.md`.
 
 ### Checklist
 
 - [ ] Teste manual
+- [ ] Screenshots anexadas (ou PR sem mudança visual)
 - [ ] Mudança em variável de ambiente (Vercel) ou secret (GitHub)
 - [ ] Mudança no formato da planilha, do documento ou do calendário (avisar a equipe)

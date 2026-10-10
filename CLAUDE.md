@@ -148,7 +148,8 @@ para as páginas novas, com 308 permanente. Mantém link antigo e posição no G
 - Adote o estilo de PR preferido do repositório:
   - resumo conciso da alteração
   - lista simples de tópicos para comportamentos relevantes, endpoints, efeitos colaterais, documentação, etc
-  - screenshot da alteração, se possivel (a Vercel comenta o link do preview no PR)
+  - screenshots da alteração, obrigatórias quando o PR muda tela (ver "Screenshots no PR"). A
+    Vercel também comenta o link do preview no PR
 
 - **Avisar ANTES de implementar** se um pedido não encaixa bem no modelo atual (escopo ambíguo,
   algo que pediria banco de dados ou login) — não implementar e descobrir o problema no meio.
@@ -185,6 +186,39 @@ npx tsc --noEmit && npm run lint && npm run build
 O `npm run build` mostra a coluna `Revalidate` das páginas com dado do Google (esperado: `10m` e
 `1d`). Pra ver o resultado, `npm run start` e abrir no navegador, de preferência em largura de
 celular. Mudou leitor do Google? Teste contra o arquivo real, não só contra exemplo.
+
+## Screenshots no PR
+
+Todo PR que muda tela leva screenshots na descrição, como prova da alteração. O GitHub não aceita
+upload de imagem por linha de comando, então as imagens ficam numa branch só para isso.
+
+1. Abra o PR primeiro, para saber o número (`<n>`).
+2. Com o site rodando (`npm run build && npm run start`, porta 3000), tire as capturas:
+
+   ```bash
+   node scripts/pr-screenshots.mjs /tmp/shots              # todas as páginas
+   node scripts/pr-screenshots.mjs /tmp/shots / /contato   # só as que mudaram
+   ```
+
+   O script gera `<tela>-desktop.png` e `<tela>-mobile.png`, página inteira. Precisa de Chromium
+   ou Chrome (`CHROME_PATH` se não estiver no lugar padrão do macOS) e de `BASE_URL` se a porta
+   não for a 3000.
+3. Converta para JPEG, para as imagens não pesarem:
+   `sips -s format jpeg -s formatOptions 85 x.png --out x.jpg`.
+4. Suba em `pr-<n>/` na branch **`pr-screenshots`**. Ela só tem imagens, nunca recebe merge e tem
+   um `vercel.json` que desliga o deploy dela. Se ainda não existir na sua cópia, `git fetch`;
+   para mexer nela, use um clone ou worktree à parte, nunca a pasta do código.
+5. Na descrição do PR, seção "Screenshots", aponte para
+   `https://raw.githubusercontent.com/pibbarueri/site/pr-screenshots/pr-<n>/<tela>-desktop.jpg`
+   (o repo é público, então o link abre sem login). Veja o PR #1 como modelo de tabela.
+
+Observações:
+
+- As capturas usam os dados reais do Google (calendário, documento, canal do YouTube). Elas mudam
+  com o tempo e isso não é bug.
+- O player do YouTube não aparece em navegador sem interface. Por isso a última mensagem é uma
+  miniatura com botão de play (`src/components/video-embed.tsx`).
+- Sessão sem navegador (nuvem): escreva isso na seção e descreva o que conferir à mão.
 
 ## Sessões na nuvem (claude.ai/code)
 
