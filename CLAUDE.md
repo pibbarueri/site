@@ -57,17 +57,30 @@ Regras desse esquema:
   estão lá, e mudar um horário permanente é editar a planilha, não o código.
 - **Agenda: rotina x esporádico** (`src/lib/ical-parse.ts`, `parseCalendar`). Série que repete
   **toda semana por 8 semanas ou mais** (`ROUTINE_MIN_WEEKS`) é rotina: EBD, EBD+, culto, GPs.
-  Ela não entra na lista da Agenda nem em "Próximos eventos". Vira uma linha do quadro "Toda
+  Ela não entra no calendário da Agenda nem em "Próximos eventos". Vira uma linha do quadro "Toda
   semana" (`weekly`), com título, dia, horário e descrição tirados do próprio evento. Todo o resto
-  é evento da lista: dia único, mensal, anual e série semanal curta (um curso de 6 semanas).
+  é evento do calendário: dia único, mensal, anual e série semanal curta (um curso de 6 semanas).
   A regra é por recorrência, sem etiqueta: ninguém precisa marcar nada no Calendar.
-- **Cancelamento e mudança de uma ocorrência da rotina aparecem na lista.** Apagar um domingo só
+- **Cancelamento e mudança de uma ocorrência da rotina aparecem no calendário.** Apagar um domingo só
   ("Este evento") põe um `EXDATE` na série, e o site mostra o card "Não haverá" (`kind:
   "cancelled"`). Editar um dia só (nome ou horário) cria uma exceção, e o card sai como "Alterado"
   (`kind: "changed"`). `STATUS:CANCELLED` também vira "Não haverá". Se mexer nesse trecho, testar
   com os três casos (EXDATE, exceção, série curta) e com o calendário real.
 - **A série semanal tem data final** (`UNTIL`). Passada essa data, o item some do quadro "Toda
-  semana". A equipe precisa renovar a série antes (`docs/content-editing.md` avisa isso).
+  semana". Ele volta sozinho quando uma série nova (mesmo título e horário ou não) tiver um encontro
+  nos próximos 45 dias (`WEEKLY_LOOKAHEAD_DAYS`). Se a série nova for criada antes do fim da
+  antiga, não há buraco, e títulos iguais no mesmo dia e horário aparecem uma vez só. A equipe
+  precisa renovar a série antes do fim (`docs/content-editing.md` avisa isso).
+- **A página Agenda é um calendário mensal** (`src/components/agenda-calendar.tsx`, componente
+  client). A janela vai do início do mês atual até 12 meses à frente (`MONTHS_SHOWN` em
+  `calendar.ts`). Clicar num dia mostra os eventos dele num painel embaixo (no celular o quadrado
+  só mostra pontos). A página inicial usa `upcoming`, que já vem sem o que acabou.
+- **Hoje no calendário**: `new Date()` não pode rodar no prerender. `agenda-calendar.tsx` usa
+  `useSyncExternalStore` com o dia em que o Calendar foi lido (`today`) como valor do servidor, e
+  troca pelo dia do navegador depois de hidratar. Dia sempre como string `YYYY-MM-DD` no fuso
+  `SITE.timeZone` (`src/lib/dates.ts`).
+- **`src/lib/calendar-types.ts` fica leve**: ele entra no bundle do navegador. Não importar
+  `ical.js` nem nada pesado nele, nem em `calendar-grid.ts` e `dates.ts`.
 - O quadro "Toda semana" da Agenda vem do Calendar. Já os "Horários" da página inicial vêm da
   aba `horarios` da planilha (ou de `DEFAULT_SCHEDULE`). São duas fontes, então mudança permanente
   de horário precisa ser feita nas duas.

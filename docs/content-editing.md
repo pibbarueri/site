@@ -6,9 +6,9 @@ O site lê quatro arquivos do Google. Quem edita não precisa de código nem de 
 
 Edite o calendário **PIBB Eventos** no Google Agenda. O site separa os eventos em dois tipos, sozinho, olhando como o evento se repete.
 
-**Rotina (toda semana).** Evento que se repete toda semana por 8 semanas ou mais, como EBD, EBD+, culto e GPs. Ele não enche a lista da Agenda. Aparece uma vez só, no quadro "Toda semana" no alto da página Agenda. O título, o dia, o horário e a descrição do quadro vêm do próprio evento.
+**Rotina (toda semana).** Evento que se repete toda semana por 8 semanas ou mais, como EBD, EBD+, culto e GPs. Ele não enche o calendário da Agenda. Aparece uma vez só, no quadro "Toda semana" no alto da página Agenda. O título, o dia, o horário e a descrição do quadro vêm do próprio evento.
 
-**Eventos da lista.** Todo o resto: evento de um dia só, evento mensal ou anual, evento de dia inteiro ou de vários dias, e série semanal curta (um curso de 6 semanas, por exemplo). Eles aparecem na página Agenda, por mês, e nos "Próximos eventos" da página inicial.
+**Eventos do calendário.** Todo o resto: evento de um dia só, evento mensal ou anual, evento de dia inteiro ou de vários dias, e série semanal curta (um curso de 6 semanas, por exemplo). Eles aparecem num calendário mensal na página Agenda (clique no dia para ver os detalhes) e nos "Próximos eventos" da página inicial. O calendário mostra o mês atual e os 11 seguintes.
 
 ### Cancelar ou mudar um dia da rotina
 
@@ -21,7 +21,7 @@ Se você apagar "Todos os eventos", a série inteira some, inclusive do quadro "
 
 ### Atenção: série semanal tem data final
 
-Quando você cria EBD, culto ou GP toda semana, o Google pede até quando repetir. Passada essa data, o item some do quadro "Toda semana". Renove a série antes de acabar (estenda a data final ou crie uma nova). Hoje, as séries terminam no fim de novembro (GP nos Lares) e em dezembro de 2026 (as demais).
+Quando você cria EBD, culto ou GP toda semana, o Google pede até quando repetir. Passada essa data, o item some do quadro "Toda semana". Ele volta sozinho assim que uma série nova tiver um encontro nos próximos 45 dias. Se você criar a série nova antes de a antiga acabar, o item não some nunca. Se preferir esperar, o item fica fora do quadro durante o recesso e reaparece cerca de um mês e meio antes do primeiro encontro. Hoje, as séries terminam no fim de novembro (GP nos Lares) e em dezembro de 2026 (as demais).
 
 ### Outras regras
 
