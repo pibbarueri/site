@@ -1,24 +1,42 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DayCard } from "@/components/day-card";
-import { RichText } from "@/components/rich-text";
 import { ScheduleList } from "@/components/schedule-list";
 import { VideoEmbed } from "@/components/video-embed";
 import { Container, primaryButton, Section, secondaryButton, textLink } from "@/components/ui";
 import { getCalendar } from "@/lib/calendar";
 import { groupByDay } from "@/lib/calendar-grid";
-import { SITE } from "@/lib/config";
-import { longDate } from "@/lib/format";
-import { getNews, getSchedule } from "@/lib/sheet";
+import { DEFAULT_SCHEDULE, SITE } from "@/lib/config";
+import { longDate, weeklyToSchedule } from "@/lib/format";
 import { getVideos } from "@/lib/youtube";
 
+// The first screen: logo, name and the two main buttons.
+function Hero() {
+  return (
+    <div className="bg-[radial-gradient(ellipse_at_top,rgba(75,52,31,0.5),transparent_65%)]">
+      <Container className="flex flex-col items-center py-16 text-center sm:py-24">
+        <Image src="/logo.png" alt="" width={140} height={150} priority />
+        <h1 className="mt-8 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">{SITE.name}</h1>
+        <p className="mt-4 max-w-xl text-lg text-muted">
+          Será um prazer receber você, seus familiares e amigos no próximo encontro!
+        </p>
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer" className={primaryButton}>
+            Como chegar
+          </a>
+          <Link href="/agenda" className={secondaryButton}>
+            Ver a agenda
+          </Link>
+        </div>
+      </Container>
+    </div>
+  );
+}
+
 export default async function Home() {
-  const [schedule, calendar, videos, news] = await Promise.all([
-    getSchedule(),
-    getCalendar(),
-    getVideos(1),
-    getNews(3),
-  ]);
+  const [calendar, videos] = await Promise.all([getCalendar(), getVideos(1)]);
+  // The weekly routine comes from the calendar, the same source as the Agenda page.
+  const schedule = calendar.weekly.length > 0 ? weeklyToSchedule(calendar.weekly) : DEFAULT_SCHEDULE;
   // One block per day. A multi-day event also adds days that already passed, so skip those.
   const days = [...groupByDay(calendar.upcoming)]
     .filter(([day]) => day >= calendar.today)
@@ -27,24 +45,8 @@ export default async function Home() {
 
   return (
     <>
-      <section className="border-b border-border bg-[radial-gradient(ellipse_at_top,rgba(75,52,31,0.5),transparent_65%)]">
-        <Container className="flex flex-col items-center py-16 text-center sm:py-24">
-          <Image src="/logo.png" alt="" width={140} height={150} priority />
-          <h1 className="mt-8 max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">
-            {SITE.name}
-          </h1>
-          <p className="mt-4 max-w-xl text-lg text-muted">
-            Será um prazer receber você, seus familiares e amigos no próximo encontro!
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a href={SITE.mapsUrl} target="_blank" rel="noopener noreferrer" className={primaryButton}>
-              Como chegar
-            </a>
-            <Link href="/agenda" className={secondaryButton}>
-              Ver a agenda
-            </Link>
-          </div>
-        </Container>
+      <section className="border-b border-border">
+        <Hero />
       </section>
 
       <Section title="Venha nos visitar" id="visite">
@@ -132,32 +134,6 @@ export default async function Home() {
                 Assistir no YouTube
               </a>
             </div>
-          </div>
-        </Section>
-      )}
-
-      {news.length > 0 && (
-        <Section title="Novidades">
-          <div className="grid gap-4 md:grid-cols-3">
-            {news.map((item) => (
-              <article
-                key={`${item.date}-${item.title}`}
-                className="rounded-lg border border-border bg-surface p-5 wrap-anywhere"
-              >
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-                  {longDate(item.date)}
-                </p>
-                <h3 className="mt-2 text-lg font-semibold leading-snug">{item.title}</h3>
-                <p className="mt-2 whitespace-pre-line text-sm">
-                  <RichText text={item.text} />
-                </p>
-                {item.link && (
-                  <a href={item.link} target="_blank" rel="noopener noreferrer" className={`mt-4 inline-block text-sm font-medium ${textLink}`}>
-                    Saiba mais
-                  </a>
-                )}
-              </article>
-            ))}
           </div>
         </Section>
       )}
