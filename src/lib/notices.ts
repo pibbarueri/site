@@ -46,7 +46,8 @@ export async function getNotices(): Promise<Notice[]> {
   cacheLife({ stale: 300, revalidate: 600, expire: 86400 });
 
   const key = process.env.GOOGLE_DRIVE_API_KEY;
-  // `vercel pull` writes variables marked as Sensitive as this literal during the build.
+  // `vercel pull` writes variables of type Secret (formerly Sensitive) as this literal during
+  // the build, so the key is missing there. See docs/notices-setup.md, "Config ou Secret".
   if (!key || key === "[SENSITIVE]") return [];
 
   try {
