@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/ministerios", label: "Ministérios" },
   { href: "/agenda", label: "Agenda" },
   { href: "/mensagens", label: "Mensagens" },
+  { href: "/galeria", label: "Galeria" },
   { href: "/contato", label: "Contato" },
 ];
 

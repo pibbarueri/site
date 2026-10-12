@@ -20,6 +20,8 @@ export const SITE = {
     "https://calendar.google.com/calendar/u/0?cid=Y19kMjdlZjhjZDFhYTIyODI0NDY3OTNlZWNmN2QwOGNlNTc1ODY0OWI4YjNiODA5ZDIzNmMxMTU4ZDhhZDFhMWU0QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20",
   // Drive folder with the notice images (read with the Drive API, see src/lib/notices.ts).
   noticesFolderId: "1wucExUizDZ9j6M8w-iiVb7EISVh8fo3e",
+  // Drive folder of the photo gallery. Each subfolder is an album (see src/lib/gallery.ts).
+  galleryFolderId: "1oZr9GTNvynnzY3zNKIGnH6xRdwi2MVum",
   ministriesDocId: "1twCge20TtZXN-vZrMX82ZZRCpY8TgrnnH73T8gbuorQ",
   aboutDocId: "1_Zity74dEnqri1tA5D4DLuqWidUNEt23wzxnlN1g0Zo",
   // Institutional PDFs, shown on "Quem somos". They are fixed links on purpose: links pasted in
