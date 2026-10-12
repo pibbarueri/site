@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { RichText } from "@/components/rich-text";
 import { Container, PageTitle, textLink } from "@/components/ui";
 import { SITE } from "@/lib/config";
 import { getMinistries, isLeadershipLine } from "@/lib/ministries";
@@ -44,16 +45,18 @@ export default async function Ministries() {
                   block.type === "list" ? (
                     <ul key={i} className="mt-4 list-disc space-y-1 pl-5 marker:text-brand">
                       {block.items.map((item) => (
-                        <li key={item}>{item}</li>
+                        <li key={item}>
+                          <RichText text={item} />
+                        </li>
                       ))}
                     </ul>
                   ) : isLeadershipLine(block.text) ? (
                     <p key={i} className="mt-4 border-t border-border pt-3 text-sm text-muted">
-                      {block.text}
+                      <RichText text={block.text} />
                     </p>
                   ) : (
                     <p key={i} className="mt-4 leading-relaxed text-neutral-200">
-                      {block.text}
+                      <RichText text={block.text} />
                     </p>
                   ),
                 )}
