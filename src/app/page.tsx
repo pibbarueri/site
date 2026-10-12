@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DayCard } from "@/components/day-card";
+import { RichText } from "@/components/rich-text";
 import { ScheduleList } from "@/components/schedule-list";
 import { VideoEmbed } from "@/components/video-embed";
 import { Container, primaryButton, Section, secondaryButton, textLink } from "@/components/ui";
@@ -147,7 +148,9 @@ export default async function Home() {
                   {longDate(item.date)}
                 </p>
                 <h3 className="mt-2 text-lg font-semibold leading-snug">{item.title}</h3>
-                <p className="mt-2 whitespace-pre-line text-sm">{item.text}</p>
+                <p className="mt-2 whitespace-pre-line text-sm">
+                  <RichText text={item.text} />
+                </p>
                 {item.link && (
                   <a href={item.link} target="_blank" rel="noopener noreferrer" className={`mt-4 inline-block text-sm font-medium ${textLink}`}>
                     Saiba mais

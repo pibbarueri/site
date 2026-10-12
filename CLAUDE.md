@@ -64,7 +64,9 @@ Regras desse esquema:
   páginas: devolve títulos, parágrafos e listas na ordem do documento. **Negrito, itálico e links
   colados são descartados** (o site decide o visual). Em compensação, email e endereço `http(s)`
   escritos no texto viram link sozinhos (`src/components/rich-text.tsx`, só `http` e `https`, nunca
-  HTML injetado). Texto de documento sempre passa por `RichText`.
+  HTML injetado). **Todo texto livre passa por `RichText`**: documentos, descrição e local de
+  evento, avisos e observações de horário, e as mensagens de erro do formulário (que citam o email
+  da igreja). Texto novo vindo de fora do código entra por ele também.
 - **Aba `horarios` vazia**: vale `DEFAULT_SCHEDULE` em `src/lib/config.ts`. Os horários oficiais
   estão lá, e mudar um horário permanente é editar a planilha, não o código.
 - **Agenda: rotina x esporádico** (`src/lib/ical-parse.ts`, `parseCalendar`). Série que repete
