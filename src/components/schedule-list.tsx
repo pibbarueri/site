@@ -1,3 +1,4 @@
+import { RichText } from "@/components/rich-text";
 import type { ScheduleItem } from "@/lib/config";
 
 export function ScheduleList({ items }: { items: ScheduleItem[] }) {
@@ -16,7 +17,11 @@ export function ScheduleList({ items }: { items: ScheduleItem[] }) {
               <span className="w-14 shrink-0 font-semibold">{item.time}</span>
               <span className="min-w-0 wrap-anywhere">
                 {item.name}
-                {item.note && <span className="block text-sm text-muted">{item.note}</span>}
+                {item.note && (
+                  <span className="block text-sm text-muted">
+                    <RichText text={item.note} />
+                  </span>
+                )}
               </span>
             </dd>
           ))}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { RichText } from "@/components/rich-text";
 import { primaryButton } from "@/components/ui";
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -92,8 +93,8 @@ export function ContactForm() {
       </button>
 
       {status === "error" && (
-        <p role="alert" className="text-sm text-white underline decoration-brand decoration-2 underline-offset-4">
-          {errorMessage}
+        <p role="alert" className="border-l-2 border-brand pl-3 text-sm">
+          <RichText text={errorMessage} />
         </p>
       )}
     </form>

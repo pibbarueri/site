@@ -1,3 +1,4 @@
+import { RichText } from "@/components/rich-text";
 import type { CalendarEvent } from "@/lib/ical-parse";
 import { dayLabel, eventWhen } from "@/lib/format";
 
@@ -49,9 +50,15 @@ export function DayCard({
                 )}
                 <h4 className="font-semibold">{event.title}</h4>
                 <p className="text-sm text-muted">{eventWhen(event).timeLabel}</p>
-                {event.location && <p className="text-sm text-muted">{event.location}</p>}
+                {event.location && (
+                  <p className="text-sm text-muted">
+                    <RichText text={event.location} />
+                  </p>
+                )}
                 {event.description && (
-                  <p className="mt-2 whitespace-pre-line text-sm">{event.description}</p>
+                  <p className="mt-2 whitespace-pre-line text-sm">
+                    <RichText text={event.description} />
+                  </p>
                 )}
               </li>
             );
