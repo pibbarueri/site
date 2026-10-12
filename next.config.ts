@@ -27,7 +27,11 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
+      // Notice images from the Drive folder.
+      { protocol: "https", hostname: "lh3.googleusercontent.com", pathname: "/d/**" },
+    ],
   },
   async redirects() {
     return [
