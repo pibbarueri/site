@@ -1,6 +1,6 @@
 # Como editar o conteúdo do site
 
-O site lê estes arquivos e pastas do Google: o calendário, os dois documentos (Quem somos e Ministérios) e a pasta de avisos. Quem edita não precisa de código nem de acesso à Vercel. A mudança aparece no site em até 10 minutos.
+O site lê estes arquivos e pastas do Google: o calendário, os dois documentos (Quem somos e Ministérios) e as pastas de avisos e da galeria de fotos. Quem edita não precisa de código nem de acesso à Vercel. A mudança aparece no site em até 10 minutos.
 
 ## Agenda
 
@@ -42,6 +42,20 @@ Os avisos são imagens, as artes que a multimídia já faz, na pasta **Avisos** 
 - **Compartilhamento:** a pasta precisa estar como "Qualquer pessoa com o link pode ver". Os arquivos dentro dela herdam esse acesso.
 
 Os horários de culto da página inicial não têm mais uma planilha. Eles vêm da rotina semanal do calendário, a mesma do quadro "Toda semana" da Agenda. Para mudar um horário de forma permanente, mude a série no Google Agenda.
+
+## Galeria de fotos
+
+As fotos ficam na pasta **Galeria de Fotos** do Drive e aparecem na aba "Galeria" do site.
+
+- **Álbuns:** cada subpasta é um álbum, e o nome da pasta é o título dele. Para criar um álbum, crie uma subpasta dentro de Galeria de Fotos e coloque as fotos nela. Para tirar um álbum, apague a pasta.
+- **Ordem dos álbuns:** do criado por último para o mais antigo, no máximo 20.
+- **Ordem das fotos:** pela ordem do nome do arquivo (IMG_001, IMG_002...). Para escolher a ordem, renomeie as fotos com números.
+- **Limites:** até 150 fotos por álbum. Álbum sem fotos não aparece. Fotos soltas na pasta Galeria de Fotos, fora de uma subpasta, não aparecem, e subpastas dentro de um álbum também não.
+- **Como aparece:** cada álbum é uma linha de fotos que rola para o lado. Clicar numa foto abre a foto ampliada. Clicar no nome do álbum, em "Ver álbum" ou em "Ver as N fotos" abre todas as fotos do álbum, com rolagem para baixo. Na foto ampliada, as setas (ou as teclas ← e →, ou deslizar o dedo no celular) passam para a foto anterior e a próxima daquele álbum. O X de uma foto aberta de dentro do álbum volta para o álbum. O X de uma foto aberta direto da linha fecha tudo.
+- **Tamanho das fotos:** o site mostra versões reduzidas, geradas pelo Google, então não é preciso diminuir as fotos antes. Fotos muito grandes só demoram mais para subir para o Drive.
+- **Nomes dos arquivos:** não aparecem no site. Quem usa leitor de tela ouve "Nome do álbum, foto 3 de 24".
+- **Compartilhamento:** a pasta Galeria de Fotos precisa estar como "Qualquer pessoa com o link pode ver". As subpastas e as fotos herdam esse acesso.
+- **Demora:** a mudança aparece em até 10 minutos.
 
 ## Quem somos
 

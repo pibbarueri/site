@@ -1,6 +1,6 @@
-# Ativar os avisos (chave da API do Google Drive)
+# Chave da API do Google Drive (avisos e galeria)
 
-O site lista as imagens da pasta **Avisos** pela API do Google Drive, que exige uma chave. Sem a chave, o site funciona normalmente e mostra só a tela de boas-vindas, sem carrossel.
+O site lista as imagens das pastas **Avisos** e **Galeria de Fotos** pela API do Google Drive, que exige uma chave. A mesma chave serve para as duas. Sem a chave, o site funciona normalmente: a página inicial mostra só a tela de boas-vindas, sem carrossel, e a Galeria mostra "Em breve".
 
 A chave só lê. Ela é restrita à API do Drive e só enxerga arquivos compartilhados por link, como a pasta Avisos.
 
@@ -18,12 +18,13 @@ Use a conta da igreja (`admin@pibbarueri.org.br`), nunca uma conta pessoal ou de
 
 ## Como conferir
 
-Coloque uma imagem de teste na pasta Avisos e abra a página inicial. O carrossel aparece em até 10 minutos. Se não aparecer, confira nesta ordem:
+Coloque uma imagem de teste na pasta Avisos e abra a página inicial, e crie uma subpasta com uma foto dentro de Galeria de Fotos e abra a aba Galeria. O carrossel e o álbum aparecem em até 10 minutos. Se algum não aparecer, confira nesta ordem:
 
-- A pasta está como "Qualquer pessoa com o link pode ver".
+- A pasta está como "Qualquer pessoa com o link pode ver" (as subpastas da galeria herdam isso, a menos que alguém tenha mudado o compartilhamento de uma delas).
 - A variável `GOOGLE_DRIVE_API_KEY` existe na Vercel para Production e é do tipo Config.
 - A Google Drive API está ativada no projeto e a chave está restrita a ela.
 - O arquivo é uma imagem (PNG ou JPG), e não um PDF ou um documento.
+- Na galeria, as fotos estão dentro de uma subpasta (álbum), e não soltas na pasta Galeria de Fotos.
 
 ## Config ou Secret
 

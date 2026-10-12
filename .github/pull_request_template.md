@@ -15,4 +15,4 @@ Descreva brevemente como foi resolvido
 - [ ] Teste manual
 - [ ] Screenshots anexadas (ou PR sem mudança visual)
 - [ ] Mudança em variável de ambiente (Vercel) ou secret (GitHub)
-- [ ] Mudança no formato dos documentos, do calendário ou da pasta Avisos (avisar a equipe)
+- [ ] Mudança no formato dos documentos, do calendário ou das pastas de avisos e galeria (avisar a equipe)
