@@ -18,6 +18,8 @@ export const SITE = {
     "https://calendar.google.com/calendar/ical/c_d27ef8cd1aa2282446793eecf7d08ce5758649b8b3b809d236c1158d8ad1a1e4%40group.calendar.google.com/public/basic.ics",
   calendarSubscribeUrl:
     "https://calendar.google.com/calendar/u/0?cid=Y19kMjdlZjhjZDFhYTIyODI0NDY3OTNlZWNmN2QwOGNlNTc1ODY0OWI4YjNiODA5ZDIzNmMxMTU4ZDhhZDFhMWU0QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20",
+  // Drive folder with the notice images (read with the Drive API, see src/lib/notices.ts).
+  noticesFolderId: "1wucExUizDZ9j6M8w-iiVb7EISVh8fo3e",
   ministriesDocId: "1twCge20TtZXN-vZrMX82ZZRCpY8TgrnnH73T8gbuorQ",
   aboutDocId: "1_Zity74dEnqri1tA5D4DLuqWidUNEt23wzxnlN1g0Zo",
   // Institutional PDFs, shown on "Quem somos". They are fixed links on purpose: links pasted in

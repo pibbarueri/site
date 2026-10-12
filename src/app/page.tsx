@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { DayCard } from "@/components/day-card";
+import { HomeCarousel } from "@/components/home-carousel";
 import { ScheduleList } from "@/components/schedule-list";
 import { VideoEmbed } from "@/components/video-embed";
 import { Container, primaryButton, Section, secondaryButton, textLink } from "@/components/ui";
@@ -8,9 +9,11 @@ import { getCalendar } from "@/lib/calendar";
 import { groupByDay } from "@/lib/calendar-grid";
 import { DEFAULT_SCHEDULE, SITE } from "@/lib/config";
 import { longDate, weeklyToSchedule } from "@/lib/format";
+import { getNotices } from "@/lib/notices";
 import { getVideos } from "@/lib/youtube";
 
-// The first screen: logo, name and the two main buttons.
+// The first screen: logo, name and the two main buttons. With notices, it is the first slide of
+// the carousel and the notices alternate with it.
 function Hero() {
   return (
     <div className="bg-[radial-gradient(ellipse_at_top,rgba(75,52,31,0.5),transparent_65%)]">
@@ -34,7 +37,7 @@ function Hero() {
 }
 
 export default async function Home() {
-  const [calendar, videos] = await Promise.all([getCalendar(), getVideos(1)]);
+  const [calendar, videos, notices] = await Promise.all([getCalendar(), getVideos(1), getNotices()]);
   // The weekly routine comes from the calendar, the same source as the Agenda page.
   const schedule = calendar.weekly.length > 0 ? weeklyToSchedule(calendar.weekly) : DEFAULT_SCHEDULE;
   // One block per day. A multi-day event also adds days that already passed, so skip those.
@@ -45,9 +48,15 @@ export default async function Home() {
 
   return (
     <>
-      <section className="border-b border-border">
-        <Hero />
-      </section>
+      {notices.length > 0 ? (
+        <HomeCarousel notices={notices}>
+          <Hero />
+        </HomeCarousel>
+      ) : (
+        <section className="border-b border-border">
+          <Hero />
+        </section>
+      )}
 
       <Section title="Venha nos visitar" id="visite">
         <div className="grid gap-6 md:grid-cols-2">
