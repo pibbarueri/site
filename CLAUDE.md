@@ -54,6 +54,11 @@ Regras desse esquema:
   `Líderes` ganha estilo discreto (`isLeadershipLine`). O título "Grupos Pequenos" vira o cartão
   largo (`slug === "grupos-pequenos"` em `src/app/ministerios/page.tsx`). Não renomear esse título
   sem ajustar o código. Parágrafo só de traços ou sublinhados é descartado.
+- **PDFs institucionais** (Confissão de Fé e Estatuto Social) são links fixos do Drive em
+  `SITE.documents` (`config.ts`), mostrados no bloco "Nossos documentos" de "Quem somos". Não vêm
+  do documento do Google porque link colado lá é descartado. O PDF precisa estar como "qualquer
+  pessoa com o link pode ver". Para trocar o arquivo sem mudar o link, use "Gerenciar versões" no
+  Drive. Arquivo novo com link novo pede mudança de código e tag.
 - **Quem somos** (`src/lib/about.ts`, `parseAbout`). O primeiro Título 1 é a página. O primeiro
   parágrafo logo abaixo, se tiver até 140 caracteres, vira a frase sob o título. Os parágrafos
   seguintes, até o primeiro Título 2, são o texto de abertura, e cada Título 2 abre uma seção.

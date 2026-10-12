@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { RichText } from "@/components/rich-text";
-import { Container, PageTitle, textLink } from "@/components/ui";
+import { Container, PageTitle, secondaryButton, textLink } from "@/components/ui";
 import { getAbout, type Person } from "@/lib/about";
 import { SITE } from "@/lib/config";
 import type { TextBlock } from "@/lib/google-doc";
@@ -87,6 +87,32 @@ export default async function AboutUs() {
             <Blocks blocks={about.intro} />
           </div>
         )}
+
+        <section aria-labelledby="documentos" className="mt-8 rounded-lg border border-border bg-surface p-6">
+          <h2 id="documentos" className="text-lg font-bold">
+            Nossos documentos
+          </h2>
+          <p className="mt-1 text-sm text-muted">Leia na íntegra. O arquivo abre em uma nova aba.</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {SITE.documents.map((doc) => (
+              <a
+                key={doc.url}
+                href={doc.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${secondaryButton} gap-3`}
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 3v5h5M9 13h6M9 17h6" />
+                </svg>
+                {doc.label}
+                <span className="text-xs font-medium text-muted">PDF</span>
+                <span className="sr-only">(abre em uma nova aba)</span>
+              </a>
+            ))}
+          </div>
+        </section>
 
         {about.sections.map((section) => (
           <section key={section.title} className="py-8">
