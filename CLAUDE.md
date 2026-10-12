@@ -27,8 +27,7 @@ código nem de acesso à Vercel. O passo a passo para a equipe está em `docs/co
 | O quê | Onde a equipe edita | Como o site lê | Código |
 | --- | --- | --- | --- |
 | Agenda e rotina semanal | Google Calendar "PIBB Eventos" | feed iCal público | `src/lib/calendar.ts`, `src/lib/ical-parse.ts` |
-| Horários de culto | Planilha, aba `horarios` | CSV via `gviz` | `src/lib/sheet.ts` |
-| Novidades (avisos) | Planilha, aba `novidades` | CSV via `gviz` | `src/lib/sheet.ts` |
+| Avisos (carrossel da página inicial) | Pasta "Avisos" no Drive (imagens) | API do Drive, com chave | `src/lib/notices.ts` |
 | Ministérios e grupos pequenos | Google Doc "Ministerios" | export HTML | `src/lib/ministries.ts` |
 | Quem somos e pastor | Google Doc "Quem somos" | export HTML | `src/lib/about.ts` |
 | Vídeos | Canal do YouTube `@pibbarueri` | feed RSS | `src/lib/youtube.ts` |
@@ -45,10 +44,6 @@ Regras desse esquema:
 - **Os arquivos do Google precisam estar como "qualquer pessoa com o link pode ver".** Se alguém
   fechar o compartilhamento, a seção correspondente fica vazia sem aviso. "Pode editar" por link é
   pior ainda: qualquer um mudaria o que aparece no site. Dê edição por email.
-- Nomes de abas e colunas da planilha ficam em português (`horarios`: `dia`, `hora`, `nome`,
-  `observacao`; `novidades`: `data`, `titulo`, `texto`, `link`, `ativo`), porque a equipe edita lá.
-  O código mapeia para campos em inglês. Mudar um nome exige combinar com a equipe e atualizar
-  `docs/content-editing.md`.
 - **Ministérios**: cada Título 1 do documento vira um cartão. O texto até o próximo Título 1 vira o
   corpo, em parágrafos e listas, na ordem do documento. Linha começando com `Liderança:` ou
   `Líderes` ganha estilo discreto (`isLeadershipLine`). O título "Grupos Pequenos" vira o cartão
@@ -72,8 +67,30 @@ Regras desse esquema:
   HTML injetado). **Todo texto livre passa por `RichText`**: documentos, descrição e local de
   evento, avisos e observações de horário, e as mensagens de erro do formulário (que citam o email
   da igreja). Texto novo vindo de fora do código entra por ele também.
-- **Aba `horarios` vazia**: vale `DEFAULT_SCHEDULE` em `src/lib/config.ts`. Os horários oficiais
-  estão lá, e mudar um horário permanente é editar a planilha, não o código.
+- **Não existe mais planilha.** Os "Horários" da página inicial e o quadro "Toda semana" da Agenda
+  vêm da mesma fonte, a rotina semanal do Calendar (`calendar.weekly`). `DEFAULT_SCHEDULE` em
+  `src/lib/config.ts` só vale se o calendário não trouxer nenhuma rotina. Mudar um horário
+  permanente é mudar a série no Calendar, não o código.
+- **Avisos** (`src/lib/notices.ts`, `src/components/home-carousel.tsx`). As imagens da pasta
+  "Avisos" do Drive viram slides de um carrossel no alto da página inicial, alternando com a tela
+  de boas-vindas (`Hero`, em `src/app/page.tsx`), que é sempre o primeiro slide. **Sem avisos, a
+  página mostra só o `Hero`, sem nenhum resto do carrossel.** Detalhes:
+  - Lista pela API do Drive v3 (`files.list`), só imagens, `createdTime desc`, no máximo 8. O nome
+    do arquivo sem extensão é o título e o texto alternativo; a descrição do arquivo, se houver,
+    vale no lugar. A imagem vem de `lh3.googleusercontent.com/d/<id>=w1600` (precisa estar em
+    `images.remotePatterns` no `next.config.ts`) e o clique abre o arquivo no visualizador do Drive.
+  - **Chave da API em `GOOGLE_DRIVE_API_KEY`** (só servidor, vai no cabeçalho `x-goog-api-key`,
+    nunca na URL nem em `NEXT_PUBLIC_`). **Não marcar como Sensitive na Vercel:** o `vercel pull`
+    grava `[SENSITIVE]` no build, e o carrossel só apareceria depois da primeira revalidação
+    (`getNotices` trata `[SENSITIVE]` como sem chave). Sem chave, chave errada, API fora do ar ou
+    erro 403, tudo cai no `Hero` sozinho. Passo a passo: `docs/notices-setup.md`.
+  - `DRIVE_API_URL` troca o endereço da API só para teste local contra um servidor falso. Não
+    configurar na Vercel.
+  - O carrossel (`HomeCarousel`, componente client) avança a cada 8 s, pausa com o mouse, com o foco
+    do teclado e no botão de pausa, não avança sozinho com `prefers-reduced-motion`, aceita setas
+    do teclado e deslizar no celular, e deixa os slides inativos `inert`. A cópia borrada que
+    preenche as laterais é ampliada e precisa de `overflow-hidden` no slide: sem isso ela vaza
+    sobre os botões e eles deixam de responder ao clique.
 - **Agenda: rotina x esporádico** (`src/lib/ical-parse.ts`, `parseCalendar`). Série que repete
   **toda semana por 8 semanas ou mais** (`ROUTINE_MIN_WEEKS`) é rotina: EBD, EBD+, culto, GPs.
   Ela não entra no calendário da Agenda nem em "Próximos eventos". Vira uma linha do quadro "Toda
@@ -108,9 +125,6 @@ Regras desse esquema:
   `SITE.timeZone` (`src/lib/dates.ts`).
 - **`src/lib/calendar-types.ts` fica leve**: ele entra no bundle do navegador. Não importar
   `ical.js` nem nada pesado nele, nem em `calendar-grid.ts` e `dates.ts`.
-- O quadro "Toda semana" da Agenda vem do Calendar. Já os "Horários" da página inicial vêm da
-  aba `horarios` da planilha (ou de `DEFAULT_SCHEDULE`). São duas fontes, então mudança permanente
-  de horário precisa ser feita nas duas.
 - O Google Calendar às vezes grava a descrição do evento com HTML. `cleanDescription` em
   `ical-parse.ts` tira as tags. Texto novo vindo do Google passa por limpeza parecida.
 - Não há CMS e não vai ter: se surgir pedido de painel de edição, avisar antes de implementar.
@@ -145,7 +159,7 @@ O guia da marca está num Canva (9 páginas, "Guia Identidade Visual PIBBARUERI"
 - **Texto que veio do Google (ou de qualquer pessoa) usa `wrap-anywhere`**, nunca `break-words`.
   `overflow-wrap: break-word` não reduz o min-content, então uma URL comprida dentro de grid ou
   flex estoura o item e pode cortar o resto do card. `min-w-0` sozinho não resolve. Vale para
-  título e descrição de evento, novidades, ministérios e títulos de vídeo.
+  título e descrição de evento, ministérios e títulos de vídeo.
 - **Datas**: nunca usar `new Date()` solto para dia de calendário nem formatar sem fuso. Use
   `Intl.DateTimeFormat` com `timeZone: SITE.timeZone` (`America/Sao_Paulo`), como em
   `src/lib/format.ts`. Evento de dia inteiro é `YYYY-MM-DD`, evento com hora é ISO completo.

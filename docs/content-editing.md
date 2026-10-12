@@ -1,6 +1,6 @@
 # Como editar o conteúdo do site
 
-O site lê cinco arquivos do Google. Quem edita não precisa de código nem de acesso à Vercel. A mudança aparece no site em até 10 minutos.
+O site lê estes arquivos e pastas do Google: o calendário, os dois documentos (Quem somos e Ministérios) e a pasta de avisos. Quem edita não precisa de código nem de acesso à Vercel. A mudança aparece no site em até 10 minutos.
 
 ## Agenda
 
@@ -28,27 +28,20 @@ Quando você cria EBD, culto ou GP toda semana, o Google pede até quando repeti
 - Eventos de dia inteiro e de vários dias funcionam.
 - O calendário precisa continuar público (Configurações do calendário, Permissões de acesso, Disponibilizar para o público).
 
-## Horários de culto e novidades
+## Avisos
 
-Planilha do Google com duas abas. Os nomes das abas e das colunas precisam ficar exatamente assim, em minúsculas e sem acento nos nomes das abas.
+Os avisos são imagens, as artes que a multimídia já faz, na pasta **Avisos** do Drive. Elas passam num carrossel no alto da página inicial, alternando com a tela de boas-vindas (o logo, o nome da igreja e os botões "Como chegar" e "Ver a agenda").
 
-Aba `horarios` (os horários que aparecem na página inicial):
+- **Publicar:** coloque a imagem (PNG ou JPG) na pasta. **Tirar:** apague o arquivo ou mova para outra pasta. A mudança aparece em até 10 minutos.
+- **Ordem:** do mais novo para o mais antigo, no máximo 8. O aviso mais novo vem logo depois da tela de boas-vindas.
+- **Título:** o nome do arquivo é o título do aviso e o texto que leitores de tela leem. Dê um nome que descreva a arte, por exemplo "Culto de Natal, 20 de dezembro". Para um texto mais completo, preencha a descrição do arquivo no Drive (botão direito, Detalhes), e ela passa a valer no lugar do nome.
+- **Tamanho:** qualquer proporção funciona. A imagem aparece inteira e as laterais ganham um fundo desfocado da própria arte. Artes quadradas (1080 por 1080) ou verticais (1080 por 1350) funcionam bem. Mantenha o essencial no centro, porque no celular a arte fica maior.
+- **Clique:** tocar no aviso abre a imagem em tamanho real em uma nova aba, útil para ler letras pequenas.
+- **Pasta vazia:** o site mostra só a tela de boas-vindas, sem carrossel.
+- **Movimento:** o carrossel troca a cada 8 segundos, para enquanto alguém passa o mouse e tem botão de pausa. Quem pede menos movimento no aparelho não vê troca automática.
+- **Compartilhamento:** a pasta precisa estar como "Qualquer pessoa com o link pode ver". Os arquivos dentro dela herdam esse acesso.
 
-| dia | hora | nome | observacao |
-| --- | --- | --- | --- |
-| Domingo | 18h30 | Culto | |
-
-Se a aba estiver vazia, o site usa os horários padrão que estão no código. Atenção: o quadro "Toda semana" da Agenda vem do calendário, e estes horários vêm da planilha. Para mudar um horário de forma permanente, atualize os dois.
-
-Aba `novidades` (os avisos da página inicial, os 3 mais recentes por data):
-
-| data | titulo | texto | link | ativo |
-| --- | --- | --- | --- | --- |
-| 18/10/2026 | Batismo | Domingo, no culto da noite. | | SIM |
-
-A data pode ser `DD/MM/AAAA` ou `AAAA-MM-DD`. Escreva `NAO` na coluna `ativo` para esconder um aviso sem apagar a linha. `link` e `observacao` são opcionais.
-
-A planilha precisa estar compartilhada como "Qualquer pessoa com o link pode ver". Para quem edita, compartilhe a edição pelo email de cada pessoa. Evite "Qualquer pessoa com o link pode editar", porque qualquer um que tenha o link poderia mudar o que aparece no site.
+Os horários de culto da página inicial não têm mais uma planilha. Eles vêm da rotina semanal do calendário, a mesma do quadro "Toda semana" da Agenda. Para mudar um horário de forma permanente, mude a série no Google Agenda.
 
 ## Quem somos
 
