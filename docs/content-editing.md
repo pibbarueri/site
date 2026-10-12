@@ -1,6 +1,6 @@
 # Como editar o conteúdo do site
 
-O site lê quatro arquivos do Google. Quem edita não precisa de código nem de acesso à Vercel. A mudança aparece no site em até 10 minutos.
+O site lê cinco arquivos do Google. Quem edita não precisa de código nem de acesso à Vercel. A mudança aparece no site em até 10 minutos.
 
 ## Agenda
 
@@ -50,11 +50,25 @@ A data pode ser `DD/MM/AAAA` ou `AAAA-MM-DD`. Escreva `NAO` na coluna `ativo` pa
 
 A planilha precisa estar compartilhada como "Qualquer pessoa com o link pode ver". Para quem edita, compartilhe a edição pelo email de cada pessoa. Evite "Qualquer pessoa com o link pode editar", porque qualquer um que tenha o link poderia mudar o que aparece no site.
 
+## Quem somos
+
+Documento do Google **Quem somos**. A estrutura do documento define a página:
+
+- O primeiro **Título 1** é o título da página ("Quem somos").
+- O primeiro parágrafo logo abaixo, se for curto (até 140 caracteres), vira a frase de destaque no alto da página. Os parágrafos seguintes, até o primeiro Título 2, são o texto de abertura.
+- Cada **Título 2** abre uma seção ("O que acreditamos", "Instituição", "Começo"), com os parágrafos e listas que vierem depois dele.
+- Cada **Título 1 a partir do segundo** vira um cartão de pessoa, como o do pastor. O primeiro parágrafo é o nome, o segundo é o cargo (curto), o terceiro é o resumo que fica sempre visível, e o resto (parágrafos e listas) aparece em "Mais detalhes". Para incluir outra pessoa, crie um novo Título 1 com o mesmo formato.
+- Use só Título 1 e Título 2. Títulos menores são ignorados.
+
+Negrito, itálico e links colados no documento não aparecem no site, só o texto. Se você escrever um email ou um endereço começando com `https://`, ele vira link sozinho.
+
+O documento também precisa estar como "Qualquer pessoa com o link pode ver".
+
 ## Ministérios
 
 Documento do Google **Ministerios**. Cada ministério é um título no estilo Título 1, seguido de parágrafos e listas. Para a liderança, escreva uma linha começando com `Liderança:` (ela ganha destaque discreto). O título "Grupos Pequenos" vira o cartão largo do final.
 
-O documento também precisa estar como "Qualquer pessoa com o link pode ver".
+O documento também precisa estar como "Qualquer pessoa com o link pode ver". Emails e endereços `https://` escritos no texto viram link, como no "Quem somos".
 
 ## Vídeos
 

@@ -30,6 +30,7 @@ código nem de acesso à Vercel. O passo a passo para a equipe está em `docs/co
 | Horários de culto | Planilha, aba `horarios` | CSV via `gviz` | `src/lib/sheet.ts` |
 | Novidades (avisos) | Planilha, aba `novidades` | CSV via `gviz` | `src/lib/sheet.ts` |
 | Ministérios e grupos pequenos | Google Doc "Ministerios" | export HTML | `src/lib/ministries.ts` |
+| Quem somos e pastor | Google Doc "Quem somos" | export HTML | `src/lib/about.ts` |
 | Vídeos | Canal do YouTube `@pibbarueri` | feed RSS | `src/lib/youtube.ts` |
 
 Os IDs dos arquivos ficam em `src/lib/config.ts` (`SITE`). São públicos, não são segredo.
@@ -53,6 +54,17 @@ Regras desse esquema:
   `Líderes` ganha estilo discreto (`isLeadershipLine`). O título "Grupos Pequenos" vira o cartão
   largo (`slug === "grupos-pequenos"` em `src/app/ministerios/page.tsx`). Não renomear esse título
   sem ajustar o código. Parágrafo só de traços ou sublinhados é descartado.
+- **Quem somos** (`src/lib/about.ts`, `parseAbout`). O primeiro Título 1 é a página. O primeiro
+  parágrafo logo abaixo, se tiver até 140 caracteres, vira a frase sob o título. Os parágrafos
+  seguintes, até o primeiro Título 2, são o texto de abertura, e cada Título 2 abre uma seção.
+  **Cada Título 1 a partir do segundo é um cartão de pessoa** (hoje, "Pastor"): o 1º parágrafo é o
+  nome, o 2º o cargo (até 80 caracteres), o 3º o resumo sempre visível, e todo o resto (parágrafos
+  e listas) fica em "Mais detalhes". Dá para ter mais de um cartão. Título 3 é ignorado.
+- **Leitura de documentos do Google** (`src/lib/google-doc.ts`, `parseDoc`) é comum às duas
+  páginas: devolve títulos, parágrafos e listas na ordem do documento. **Negrito, itálico e links
+  colados são descartados** (o site decide o visual). Em compensação, email e endereço `http(s)`
+  escritos no texto viram link sozinhos (`src/components/rich-text.tsx`, só `http` e `https`, nunca
+  HTML injetado). Texto de documento sempre passa por `RichText`.
 - **Aba `horarios` vazia**: vale `DEFAULT_SCHEDULE` em `src/lib/config.ts`. Os horários oficiais
   estão lá, e mudar um horário permanente é editar a planilha, não o código.
 - **Agenda: rotina x esporádico** (`src/lib/ical-parse.ts`, `parseCalendar`). Série que repete
