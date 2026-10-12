@@ -21,6 +21,19 @@ export const SITE = {
   sheetId: "1QcQbhlU52xANFdHEUNG2VN141-uDXEJeqK6S_rqfGp8",
   ministriesDocId: "1twCge20TtZXN-vZrMX82ZZRCpY8TgrnnH73T8gbuorQ",
   aboutDocId: "1_Zity74dEnqri1tA5D4DLuqWidUNEt23wzxnlN1g0Zo",
+  // Institutional PDFs, shown on "Quem somos". They are fixed links on purpose: links pasted in
+  // a Google Doc are dropped when the doc is read. To replace a PDF, upload a new version in
+  // Drive (Manage versions), and the link stays the same.
+  documents: [
+    {
+      label: "Confissão de Fé",
+      url: "https://drive.google.com/file/d/1M-qG2OJ5OnfJe9bUzbR0X2TH9MuVRtAv/view",
+    },
+    {
+      label: "Estatuto Social",
+      url: "https://drive.google.com/file/d/1OllIQ7aQOcVxVxcFuFfMiZ6uu8uHBuGf/view",
+    },
+  ],
   timeZone: "America/Sao_Paulo",
 } as const;
 

@@ -64,6 +64,10 @@ Negrito, itálico e links colados no documento não aparecem no site, só o text
 
 O documento também precisa estar como "Qualquer pessoa com o link pode ver".
 
+### Confissão de Fé e Estatuto Social
+
+Os dois PDFs aparecem como botões no bloco "Nossos documentos", logo depois do texto de abertura. Eles não vêm do documento "Quem somos": os links são fixos no site. Para atualizar um PDF, abra o arquivo no Drive, clique com o botão direito, escolha Gerenciar versões e envie a nova versão. O link continua o mesmo e o site mostra o arquivo novo, sem precisar de ninguém de tecnologia. Os dois arquivos precisam continuar compartilhados como "Qualquer pessoa com o link pode ver". Se um PDF novo tiver outro link (outro arquivo no Drive), aí é preciso pedir a troca no site.
+
 ## Ministérios
 
 Documento do Google **Ministerios**. Cada ministério é um título no estilo Título 1, seguido de parágrafos e listas. Para a liderança, escreva uma linha começando com `Liderança:` (ela ganha destaque discreto). O título "Grupos Pequenos" vira o cartão largo do final.
