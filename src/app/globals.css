@@ -44,6 +44,11 @@ body {
   outline-offset: 3px;
 }
 
+/* A modal (<dialog>) is open: the page behind must not scroll. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
