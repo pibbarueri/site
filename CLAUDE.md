@@ -80,9 +80,12 @@ Regras desse esquema:
     vale no lugar. A imagem vem de `lh3.googleusercontent.com/d/<id>=w1600` (precisa estar em
     `images.remotePatterns` no `next.config.ts`) e o clique abre o arquivo no visualizador do Drive.
   - **Chave da API em `GOOGLE_DRIVE_API_KEY`** (só servidor, vai no cabeçalho `x-goog-api-key`,
-    nunca na URL nem em `NEXT_PUBLIC_`). **Não marcar como Sensitive na Vercel:** o `vercel pull`
-    grava `[SENSITIVE]` no build, e o carrossel só apareceria depois da primeira revalidação
-    (`getNotices` trata `[SENSITIVE]` como sem chave). Sem chave, chave errada, API fora do ar ou
+    nunca na URL nem em `NEXT_PUBLIC_`; só esse prefixo manda variável para o navegador, e foi
+    conferido que a chave não aparece no build nem no que o visitante baixa). **Tipo Config na
+    Vercel, não Secret** (o antigo "Sensitive"): o `vercel pull` entrega `[SENSITIVE]` no lugar do
+    valor, a home é montada no build sem a chave e o carrossel só apareceria depois da primeira
+    revalidação (`getNotices` trata `[SENSITIVE]` como sem chave). Usar Secret exigiria ler os
+    avisos só no acesso (`connection()` dentro de `Suspense`), o que tira a home do estático. Sem chave, chave errada, API fora do ar ou
     erro 403, tudo cai no `Hero` sozinho. Passo a passo: `docs/notices-setup.md`.
   - `DRIVE_API_URL` troca o endereço da API só para teste local contra um servidor falso. Não
     configurar na Vercel.
