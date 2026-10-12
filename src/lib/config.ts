@@ -20,6 +20,7 @@ export const SITE = {
     "https://calendar.google.com/calendar/u/0?cid=Y19kMjdlZjhjZDFhYTIyODI0NDY3OTNlZWNmN2QwOGNlNTc1ODY0OWI4YjNiODA5ZDIzNmMxMTU4ZDhhZDFhMWU0QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20",
   sheetId: "1QcQbhlU52xANFdHEUNG2VN141-uDXEJeqK6S_rqfGp8",
   ministriesDocId: "1twCge20TtZXN-vZrMX82ZZRCpY8TgrnnH73T8gbuorQ",
+  aboutDocId: "1_Zity74dEnqri1tA5D4DLuqWidUNEt23wzxnlN1g0Zo",
   timeZone: "America/Sao_Paulo",
 } as const;
 
