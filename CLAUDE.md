@@ -28,6 +28,7 @@ código nem de acesso à Vercel. O passo a passo para a equipe está em `docs/co
 | --- | --- | --- | --- |
 | Agenda e rotina semanal | Google Calendar "PIBB Eventos" | feed iCal público | `src/lib/calendar.ts`, `src/lib/ical-parse.ts` |
 | Avisos (carrossel da página inicial) | Pasta "Avisos" no Drive (imagens) | API do Drive, com chave | `src/lib/notices.ts` |
+| Galeria de fotos | Pasta "Galeria de Fotos" no Drive (uma subpasta por álbum) | API do Drive, com chave | `src/lib/gallery.ts` |
 | Ministérios e grupos pequenos | Google Doc "Ministerios" | export HTML | `src/lib/ministries.ts` |
 | Quem somos e pastor | Google Doc "Quem somos" | export HTML | `src/lib/about.ts` |
 | Vídeos | Canal do YouTube `@pibbarueri` | feed RSS | `src/lib/youtube.ts` |
@@ -54,6 +55,31 @@ Regras desse esquema:
   do documento do Google porque link colado lá é descartado. O PDF precisa estar como "qualquer
   pessoa com o link pode ver". Para trocar o arquivo sem mudar o link, use "Gerenciar versões" no
   Drive. Arquivo novo com link novo pede mudança de código e tag.
+- **Galeria** (`src/lib/gallery.ts`, `src/components/photo-gallery.tsx`, página `/galeria`). A pasta
+  "Galeria de Fotos" do Drive (`SITE.galleryFolderId`) tem uma subpasta por álbum, e o nome da
+  subpasta é o título. Mesma chave e mesmo `listDriveFiles` dos avisos: uma consulta para as
+  subpastas (`createdTime desc`, até 20) e uma por álbum, em paralelo (`name_natural`, só imagens,
+  até 150 fotos). Álbum sem foto, ou que o Google falha em listar, é descartado. Sem chave, com
+  erro ou pasta vazia, a página mostra "Em breve" e não tem `<dialog>`. Só ids de arquivo vão para
+  o navegador.
+  - **Imagens:** `lh3.googleusercontent.com/d/<id>=<tamanho>` com `next/image` `unoptimized`
+    (miniatura `w448-h336-c`, ampliada `w1920`). O Google redimensiona e guarda em cache, e o
+    otimizador da Vercel, que tem cota mensal, fica de fora, porque uma galeria pode ter centenas de
+    fotos. Não trocar para o otimizador sem pensar na cota.
+  - **Linhas estilo Netflix:** rolagem horizontal nativa, até 12 fotos por linha mais o tile "Ver as
+    N fotos", e setas só para mouse e só nos lados em que ainda há o que rolar.
+  - **Os dois modais são `<dialog>` nativos e independentes:** o do álbum (grade com rolagem
+    vertical, sem setas) e o da foto (setas, ← e →, deslizar). A foto aberta de dentro do álbum
+    **empilha** sobre ele, e por isso o X volta ao álbum; aberta pela linha, o X fecha. Não
+    reescrever com um estado único nem com um modal feito à mão: foco preso, Esc (só o de cima),
+    fundo `inert` e devolução do foco vêm do `<dialog>`. `html:has(dialog[open])` em
+    `globals.css` trava a rolagem da página.
+  - **Acessibilidade:** o nome acessível de um botão com texto visível começa pelo texto ("Ver
+    álbum Batismo", não "Ver o álbum Batismo"), senão quem usa comando de voz não consegue
+    acioná-lo.
+  - **Como testar:** `DRIVE_API_URL` apontando para um servidor falso que responda pelo `q` (pasta
+    raiz devolve os álbuns, `'<id>' in parents` devolve as fotos). Já foram verificados em
+    navegador: abrir e fechar, empilhamento, Esc, setas, teclado, deslizar e rolagem preservada.
 - **Quem somos** (`src/lib/about.ts`, `parseAbout`). O primeiro Título 1 é a página. O primeiro
   parágrafo logo abaixo, se tiver até 140 caracteres, vira a frase sob o título. Os parágrafos
   seguintes, até o primeiro Título 2, são o texto de abertura, e cada Título 2 abre uma seção.
@@ -86,9 +112,11 @@ Regras desse esquema:
     valor, a home é montada no build sem a chave e o carrossel só apareceria depois da primeira
     revalidação (`getNotices` trata `[SENSITIVE]` como sem chave). Usar Secret exigiria ler os
     avisos só no acesso (`connection()` dentro de `Suspense`), o que tira a home do estático. Sem chave, chave errada, API fora do ar ou
-    erro 403, tudo cai no `Hero` sozinho. Passo a passo: `docs/notices-setup.md`.
+    erro 403, tudo cai no `Hero` sozinho. Passo a passo: `docs/drive-api-setup.md`.
   - `DRIVE_API_URL` troca o endereço da API só para teste local contra um servidor falso. Não
-    configurar na Vercel.
+    configurar na Vercel. A chamada à API fica em `src/lib/drive.ts` (`listDriveFiles`), usada por
+    avisos e galeria; as URLs de arquivo e de imagem, em `src/lib/drive-urls.ts` (sem acesso a
+    `process.env`, porque o navegador também importa).
   - O carrossel (`HomeCarousel`, componente client) avança a cada 8 s, pausa com o mouse, com o foco
     do teclado e no botão de pausa, não avança sozinho com `prefers-reduced-motion`, aceita setas
     do teclado e deslizar no celular, e deixa os slides inativos `inert`. A cópia borrada que
