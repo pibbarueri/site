@@ -121,7 +121,7 @@ export function HomeCarousel({ notices, children }: { notices: Notice[]; childre
               aria-roledescription="slide"
               aria-label={`${i + 2} de ${total}: ${notice.title}`}
               inert={!active}
-              className={`relative min-h-[26rem] overflow-hidden bg-black ${slideClass(active)}`}
+              className={`relative min-h-[26rem] overflow-hidden bg-surface ${slideClass(active)}`}
             >
               {/* A tiny blurred copy fills the sides, so any proportion looks intentional. */}
               <Image

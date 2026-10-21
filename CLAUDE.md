@@ -165,7 +165,8 @@ Regras desse esquema:
 O guia da marca está num Canva (9 páginas, "Guia Identidade Visual PIBBARUERI"). O site segue ele:
 
 - **Tema escuro fixo**, sem alternância para claro. Tokens em `src/app/globals.css`: fundo
-  `#0a0a0a`, texto `#f5f5f5`, `--brand` `#bd0000`, cobre `#804f27`, marrom `#4b341f`.
+  chumbo quente `#1b1917` (não preto puro, que cansa pelo contraste), texto `#f5f2ee`, `--brand`
+  `#bd0000`, cobre `#804f27`, marrom `#4b341f`, link cobre claro `#e0b88a`.
   O `color-scheme` e o `themeColor` ficam em escuro.
 - **Logo claro** (`public/logo.png`) em cabeçalho, rodapé e primeira tela. O ícone da aba
   (`src/app/icon.png`) é o logo escuro sobre branco, para aparecer em qualquer barra de abas.
@@ -173,8 +174,9 @@ O guia da marca está num Canva (9 páginas, "Guia Identidade Visual PIBBARUERI"
   cursivas. Sem serifa.
 - **Contraste**: o vermelho e o cobre sobre o fundo escuro dão cerca de 3:1. Servem para botão com
   texto branco (mais de 6:1), borda, barra e título grande. **Texto pequeno ou link nunca em
-  vermelho**: usar branco com sublinhado vermelho (`textLink` em `ui.tsx`). Texto secundário usa
-  `text-muted` (`#a3a3a3`), não o cinza `#737373` do guia, que fica no limite.
+  vermelho**: link usa o cobre claro (`text-link`) com sublinhado fino, que engrossa no hover
+  (`textLink` em `ui.tsx`). Texto secundário usa
+  `text-muted` (`#b3aba2`), não o cinza `#737373` do guia, que fica no limite.
 - **Tom de voz** dos textos: acolhedor e sério, sem ser formal, em português simples. Sem gíria e
   sem estrangeirismo (é "Mensagens", não "Sermons"; "Agenda", não "Calendar"). Vale também nos
   avisos para crianças e adolescentes.
