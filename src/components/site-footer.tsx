@@ -4,7 +4,7 @@ import { textLink } from "@/components/ui";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-black">
+    <footer className="border-t border-border bg-surface">
       <div className="mx-auto grid w-full max-w-5xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
         <div className="flex items-start gap-3">
           <Image src="/logo.png" alt="" width={56} height={60} />

@@ -6,9 +6,10 @@ export const primaryButton =
 export const secondaryButton =
   "inline-flex items-center justify-center rounded border border-border px-5 py-3 text-sm font-semibold text-white transition-colors hover:border-white";
 
-// Red is only an underline: as small text it fails contrast on the dark background.
+// Links are a light copper tint (from the brand copper) with a thin underline, because red as
+// small text fails contrast on the dark background. Hover lightens the text and thickens the line.
 export const textLink =
-  "underline decoration-brand decoration-2 underline-offset-4 hover:text-white";
+  "text-link underline decoration-link/40 decoration-1 underline-offset-4 transition-colors hover:text-link-hover hover:decoration-link-hover hover:decoration-2";
 
 export function Container({
   children,

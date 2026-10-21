@@ -3,12 +3,14 @@
 /* Paleta do guia de identidade visual da PIBB, em tema escuro fixo. */
 :root {
   color-scheme: dark;
-  --background: #0a0a0a;
-  --foreground: #f5f5f5;
-  --surface: #141414;
-  --surface-raised: #1c1c1c;
-  --border: #2b2b2b;
-  --muted: #a3a3a3;
+  --background: #1b1917;
+  --foreground: #f5f2ee;
+  --surface: #252220;
+  --surface-raised: #2f2b28;
+  --border: #3d3833;
+  --muted: #b3aba2;
+  --link: #e0b88a;
+  --link-hover: #f3d9b8;
   --brand: #bd0000;
   --brand-hover: #d40000;
   --copper: #804f27;
@@ -26,6 +28,8 @@
   --color-brand-hover: var(--brand-hover);
   --color-copper: var(--copper);
   --color-brown: var(--brown);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 }
 

@@ -34,7 +34,7 @@ export default async function Messages() {
                   rel="noopener noreferrer"
                   className="block overflow-hidden rounded-lg border border-border bg-surface transition-colors hover:border-white"
                 >
-                  <div className="aspect-video overflow-hidden bg-black">
+                  <div className="aspect-video overflow-hidden bg-surface">
                     <Image
                       src={video.thumbnail}
                       alt=""

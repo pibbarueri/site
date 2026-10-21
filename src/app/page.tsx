@@ -124,7 +124,7 @@ export default async function Home() {
           }
         >
           <div className="grid gap-6 md:grid-cols-5">
-            <div className="relative aspect-video overflow-hidden rounded-lg border border-border bg-black md:col-span-3">
+            <div className="relative aspect-video overflow-hidden rounded-lg border border-border bg-surface md:col-span-3">
               <VideoEmbed
                 id={latestVideo.id}
                 title={latestVideo.title}
