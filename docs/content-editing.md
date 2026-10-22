@@ -16,6 +16,7 @@ Use sempre "Este evento", nunca "Todos os eventos".
 
 - **Não vai ter EBD ou culto num domingo:** abra o evento daquele dia, clique em Excluir e escolha "Este evento". O site mostra um aviso "Não haverá" naquela data.
 - **O horário ou o nome muda num dia (por exemplo, "Culto de Natal"):** abra o evento daquele dia, edite e salve só "Este evento". O site mostra um aviso "Alterado" naquela data.
+- **Desistiu de cancelar:** o Google Agenda não restaura um dia apagado. Crie um evento novo naquele dia, com o **mesmo nome** e o **mesmo horário de início** da rotina (por exemplo, "EBD" às 9h30). O site entende que o dia voltou e tira o aviso "Não haverá". Se o horário for outro, o aviso continua e o evento novo aparece ao lado.
 
 Se você apagar "Todos os eventos", a série inteira some, inclusive do quadro "Toda semana".
 

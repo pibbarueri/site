@@ -71,6 +71,15 @@ function cleanDescription(text: string): string | undefined {
   return clean || undefined;
 }
 
+// A cancelled occurrence is undone by creating a regular event with the same title that starts
+// at the same moment (Google Calendar cannot restore a single deleted occurrence). The
+// replacement wins and the "Não haverá" card is dropped.
+function dropRestoredCancellations(events: CalendarEvent[]): CalendarEvent[] {
+  const key = (e: CalendarEvent) => `${e.title.trim().toLowerCase()}|${e.start}`;
+  const active = new Set(events.filter((e) => e.kind !== "cancelled").map(key));
+  return events.filter((e) => e.kind !== "cancelled" || !active.has(key(e)));
+}
+
 function isUpcoming(e: CalendarEvent, now: Date): boolean {
   if (e.allDay) return (e.end ?? e.start) >= dayInZone(now);
   return Date.parse(e.end ?? e.start) >= now.getTime();
@@ -234,7 +243,7 @@ export function parseCalendar(text: string, options: ParseOptions): ParsedCalend
     }
   }
 
-  const sorted = events.sort((a, b) => toInstant(a) - toInstant(b)).slice(0, limit);
+  const sorted = dropRestoredCancellations(events).sort((a, b) => toInstant(a) - toInstant(b)).slice(0, limit);
   return {
     events: sorted,
     upcoming: sorted.filter((e) => isUpcoming(e, now)),
