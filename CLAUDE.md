@@ -131,7 +131,9 @@ Regras desse esquema:
 - **Cancelamento e mudança de uma ocorrência da rotina aparecem no calendário.** Apagar um domingo só
   ("Este evento") põe um `EXDATE` na série, e o site mostra o card "Não haverá" (`kind:
   "cancelled"`). Editar um dia só (nome ou horário) cria uma exceção, e o card sai como "Alterado"
-  (`kind: "changed"`). `STATUS:CANCELLED` também vira "Não haverá". Se mexer nesse trecho, testar
+  (`kind: "changed"`). `STATUS:CANCELLED` também vira "Não haverá". **Desfazer um cancelamento:** o Google Calendar não restaura uma ocorrência apagada, então a equipe cria um evento
+  avulso. Se ele tem o mesmo título (sem diferenciar maiúsculas) e o mesmo início de um "Não haverá",
+  `dropRestoredCancellations` descarta o cartão de cancelamento. Início diferente mantém os dois. Se mexer nesse trecho, testar
   com os três casos (EXDATE, exceção, série curta) e com o calendário real.
 - **A série semanal tem data final** (`UNTIL`). Passada essa data, o item some do quadro "Toda
   semana". Ele volta sozinho quando uma série nova (mesmo título e horário ou não) tiver um encontro
